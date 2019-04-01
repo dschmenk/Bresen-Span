@@ -21,11 +21,12 @@ EXTRN	_mapb:BYTE
 EXTRN	_red8:WORD
 EXTRN	_grn8:WORD
 EXTRN	_blu8:WORD
+EXTRN	_idx8:WORD
 _TEXT   SEGMENT
 	ASSUME	CS: _TEXT
 
-        PUBLIC	_hspan8bpp
-_hspan8bpp	PROC NEAR
+        PUBLIC	_hspan8rgb
+_hspan8rgb	PROC NEAR
 	push	bp
 	mov	bp,sp
 	push	di
@@ -67,10 +68,35 @@ hloop:	mov	bx,cx
 	mov	sp,bp
 	pop	bp
 	ret	
-_hspan8bpp	ENDP
+_hspan8rgb	ENDP
+        PUBLIC	_hspan8
+_hspan8	        PROC NEAR
+	push	bp
+	mov	bp,sp
+	push	di
+;	xl = 4
+;	xr = 6
+;	y = 8
+        mov     ax,0A000h               ;video segment
+        mov     es,ax
+        mov     cx,WORD PTR [bp+6]	;xr
+	mov	ax,320
+	imul	WORD PTR [bp+8]	;y
+        mov     di,ax                   ;pix
+        mov     ax,WORD PTR [bp+4]	;xl
+        add     di,ax
+        sub     cx,ax                   ;xr-xl
+	mov	al,BYTE PTR _idx8
+        rep     stosb
+	mov	BYTE PTR es:[di],al
+	pop	di
+	mov	sp,bp
+	pop	bp
+	ret	
+_hspan8	        ENDP
 
-        PUBLIC	_vspan8bpp
-_vspan8bpp	PROC NEAR
+        PUBLIC	_vspan8rgb
+_vspan8rgb	PROC NEAR
 	push	bp
 	mov	bp,sp
 	push	di
@@ -82,7 +108,7 @@ _vspan8bpp	PROC NEAR
         mov     ax,0A000h               ;video segment
         mov     es,ax
 	mov	ax,320
-	imul	cx	                ;y
+	imul	cx	                ;yt
 	mov	dx,WORD PTR [bp+4]	;x
         mov     di,ax                   ;pix
         add     di,dx
@@ -111,16 +137,42 @@ vloop:	mov	bx,cx
 	mov	sp,bp
 	pop	bp
 	ret	
-_vspan8bpp	ENDP
+_vspan8rgb	ENDP
+        PUBLIC	_vspan8
+_vspan8	        PROC NEAR
+	push	bp
+	mov	bp,sp
+	push	di
+;	x = 4
+;	yt = 6
+;	yb = 8
+        mov     ax,0A000h               ;video segment
+        mov     es,ax
+	mov	bx,WORD PTR [bp+6]      ;yt
+	mov	ax,320
+	imul	bx	                ;yt
+	mov	cx,WORD PTR [bp+8]	;yb
+        mov     di,ax                   ;pix
+	add	di,WORD PTR [bp+4]	;x
+        sub     cx,bx                   ;yb-yt
+	mov	al,BYTE PTR _idx8
+        inc     cx
+vloopi:	mov	BYTE PTR es:[di],al
+	add	di,320
+	loop	vloopi
+	pop	di
+	mov	sp,bp
+	pop	bp
+	ret	
+_vspan8	        ENDP
 
-        PUBLIC	_pixel8bpp
-_pixel8bpp	PROC NEAR
+        PUBLIC	_pixel8rgb
+_pixel8rgb	PROC NEAR
 	push	bp
 	mov	bp,sp
 	push	si
 ;	x = 4
 ;	y = 6
-;	dither = -2
 	mov	ax,320
 	mov	si,WORD PTR [bp+6]	;y
         imul    si                      ;a = 320*y
@@ -147,7 +199,25 @@ _pixel8bpp	PROC NEAR
 	mov	sp,bp
 	pop	bp
 	ret	
-_pixel8bpp	ENDP
+_pixel8rgb	ENDP
+        PUBLIC	_pixel8
+_pixel8	        PROC NEAR
+	push	bp
+	mov	bp,sp
+;	x = 4
+;	y = 6
+	mov	ax,320
+        imul    WORD PTR [bp+6]         ;y
+        mov     bx,ax
+	add	bx,WORD PTR [bp+4]	;x
+        mov     ax, 0A000h              ;video segment
+        mov     es, ax
+	mov	al,BYTE PTR _idx8
+	mov	es:[bx],al
+	mov	sp,bp
+	pop	bp
+	ret	
+_pixel8	        ENDP
 _TEXT	ENDS
 END
 
