@@ -1,7 +1,3 @@
-/*
- * Copyright 2019, David Schmenk
- */
-
 #include <stdio.h>
 #include <bios.h>
 #include <dos.h>
@@ -11,19 +7,20 @@
 static unsigned char far *vidmem = (unsigned char far *)0xA0000000L;
 static int orgmode;
 static unsigned int mapsel[] = {0x0102, 0x0202, 0x0402, 0x0802};
-static signed char dithmatrix[4][4] =
+signed char dithmatrix[4][4] =
 {
     {  0, 25,   6, 31},
     { 17,  8,  23, 14},
     {  4, 29,   2, 27},
     { 21, 12,  19, 10}
 };
-static unsigned char mapr[256+32];
-static unsigned char mapg[256+32];
-static unsigned char mapb[256+64];
-static unsigned red8, grn8, blu8;
+unsigned char mapr[256+32];
+unsigned char mapg[256+32];
+unsigned char mapb[256+64];
+unsigned red8, grn8, blu8;
 void (*hspan)(int xl, int xr, int y);
 void (*vspan)(int x, int yt, int yb);
+void (*pixel)(int x, int y);
 
 unsigned long gettime(void)
 {
@@ -91,6 +88,7 @@ void restoremode(void)
     regs.x.ax = orgmode;
     int86(0x10, &regs, &regs);
 }
+#if 0
 void hspan8bpp(int xl, int xr, int y)
 {
     int dither;
@@ -118,19 +116,21 @@ void vspan8bpp(int x, int yt, int yb)
         pix   += 320;
     } while (++yt <= yb);
 }
-#if 1
 void pixel8bpp(int x, int y)
 {
     int dither;
     dither = dithmatrix[y & 3][x & 3];
     vidmem[y * 320 + x] = mapr[red8 + dither] | mapg[grn8 + dither] | mapb[blu8 + dither*2];
 }
-void (*pixel)(int x, int y) = pixel8bpp;
-#else
-#define pixel(x,y)	{int _d=dithmatrix[(y)&3][(x)&3];vidmem[y*320+x]=mapr[red8+_d]|mapg[grn8+_d]|mapb[blu8+_d*2];}
-#endif
 #include "fastline.c"
 #include "line.c"
+#else
+extern void hspan8bpp(int xl, int xr, int y);
+extern void vspan8bpp(int x, int yt, int yb);
+extern void pixel8bpp(int x, int y);
+extern void line(int x1, int y1, int x2, int y2);
+extern void fast_line(int x1, int y1, int x2, int y2);
+#endif
 int main(int argc, char **argv)
 {
     long int n, c;
@@ -146,6 +146,7 @@ int main(int argc, char **argv)
     setmodex(0x13, c);
     hspan = hspan8bpp;
     vspan = vspan8bpp;
+    pixel = pixel8bpp;
 #if 0
     for (n = 100; n < 200; n++)
     {
