@@ -66,7 +66,7 @@ absy:
 xmajor:
 	mov	di,bx	                ;dy2
 	or      dx,dx	                ;sx
-	jge	lefttoright
+	jge	leftright
 	mov	dx,WORD PTR [bp+4]	;x1
 	mov	bx,WORD PTR [bp+8]	;x2
 	mov	WORD PTR [bp+4],bx	;x1
@@ -76,9 +76,8 @@ xmajor:
 	mov	WORD PTR [bp+6],bx	;y1
 	mov	WORD PTR [bp+10],dx	;y2
 	neg	cx                      ;sy
-lefttoright:
+leftright:
 	mov	WORD PTR [bp-12],cx	;sy
-;	mov	ax,WORD PTR [bp-14]	;dx2
 	shr	ax,1                    ;dx2/2
 	sub	di,ax                   ;err
 	mov	si,WORD PTR [bp+4]	;x1
@@ -106,7 +105,7 @@ xstep:
 ymajor:
 	mov	di,ax	                ;dx2
         or      cx,cx	                ;sy
-	jge	toptobottom
+	jge	topbottom
 	mov	ax,WORD PTR [bp+4]	;x1
 	mov	cx,WORD PTR [bp+8]	;x2
 	mov	WORD PTR [bp+4],cx	;x1
@@ -116,9 +115,8 @@ ymajor:
 	mov	WORD PTR [bp+6],cx	;y1
 	mov	WORD PTR [bp+10],ax	;y2
 	neg	dx                      ;sx
-toptobottom:
+topbottom:
 	mov	WORD PTR [bp-10],dx	;sx
-;	mov	cx,WORD PTR [bp-20]	;dy2
         shr     bx,1                    ;dy2/2
 	sub	di,bx
 	mov	si,WORD PTR [bp+6]	;y1
