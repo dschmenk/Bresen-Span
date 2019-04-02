@@ -6,7 +6,7 @@ There are many computer graphics papers written about improving upon the standar
 To start with, here is the simple, clean, and elegant algorithm as implemeted by Bresenham:
 
 ```
-void line(int x1, int y1, int x2, int y2)
+void pixline(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
 
@@ -56,7 +56,7 @@ I will assume there are no questions about the baseline Bresenham line algorithm
 
 We will start off looking very much like the standard algorithm:
 ```
-void fast_line(int x1, int y1, int x2, int y2)
+void line(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
     int shorterr, shortlen, longerr, longlen, halflen;
