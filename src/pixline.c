@@ -1,11 +1,6 @@
-/*
- * Copyright 2019, David Schmenk
- */
-
-void line(int x1, int y1, int x2, int y2)
+void pixline(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
-    int shorterr, shortlen, longerr, longlen;
 
     sx = sy = 1;
     if ((dx2 = (x2 - x1) * 2) < 0)

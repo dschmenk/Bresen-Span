@@ -18,8 +18,8 @@ EXTRN	_hspan:NEAR
 EXTRN	_vspan:NEAR
 _TEXT   SEGMENT
 	ASSUME	CS: _TEXT
-	PUBLIC	_fast_line
-_fast_line	PROC NEAR
+	PUBLIC	_line
+_line	PROC NEAR
 	push	bp
 	mov	bp,sp
 	sub	sp,22
@@ -46,27 +46,27 @@ _fast_line	PROC NEAR
 	sub	ax,WORD PTR [bp+4]	;x1
 	shl	ax,1
 	or	ax,ax
-	jge	absx
+	jge	x_abs
         neg     dx	                ;sx
 	neg	ax                      ;dx2
-absx:
+x_abs:
 	mov	bx,WORD PTR [bp+10]	;y2
 	sub	bx,WORD PTR [bp+6]	;y1
 	shl	bx,1
 	or	bx,bx
-	jge	absy
+	jge	y_abs
         neg     cx	                ;sy
 	neg	bx                      ;dy2
-absy:
+y_abs:
 	mov	WORD PTR [bp-16],ax	;dx2
 	mov	WORD PTR [bp-22],bx	;dy2
 	cmp	ax,bx	                ;dx2>=dy2?
-	jge	xmajor
-	jmp	ymajor
+	jge	x_major
+	jmp	y_major
 ;
 ;
 ;
-xmajor:
+x_major:
         or      dx,dx                   ;sx
 	jge	leftright
 	mov	si,WORD PTR [bp+4]	;x1
@@ -152,7 +152,7 @@ hlast:
 ;
 ;
 ;
-ymajor:
+y_major:
 	or	cx,cx	                ;sy
 	jge	topbottom
 	mov	si,WORD PTR [bp+4]	;x1
@@ -241,7 +241,7 @@ exit:
 	mov	sp,bp
 	pop	bp
 	ret	
-_fast_line	ENDP
+_line	ENDP
 _TEXT	ENDS
 END
 

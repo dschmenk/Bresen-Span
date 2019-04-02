@@ -17,8 +17,8 @@ DGROUP	GROUP	CONST, _BSS, _DATA
 EXTRN	_pixel:NEAR
 _TEXT   SEGMENT
 	ASSUME	CS: _TEXT
-	PUBLIC	_line
-_line	PROC NEAR
+	PUBLIC	_pixline
+_pixline        PROC NEAR
 	push	bp
 	mov	bp,sp
 	sub	sp,20
@@ -44,26 +44,26 @@ _line	PROC NEAR
 	sub	ax,WORD PTR [bp+4]	;x1
 	shl	ax,1
 	or	ax,ax
-	jge	absx
+	jge	x_abs
 	neg	dx                      ;sx
         neg     ax
-absx:
+x_abs:
 	mov	bx,WORD PTR [bp+10]	;y2
 	sub	bx,WORD PTR [bp+6]	;y1
 	shl	bx,1
 	or	bx,bx
-	jge	absy
+	jge	y_abs
 	neg     cx	                ;sy
 	neg	bx
-absy:
+y_abs:
 	mov	WORD PTR [bp-14],ax	;dx2
 	mov	WORD PTR [bp-20],bx	;dy2
         cmp     bx,ax                   ;dx2>=dy2?
-	jg	ymajor
+	jg	y_major
 ;
 ;
 ;
-xmajor:
+x_major:
 	mov	di,bx	                ;dy2
 	or      dx,dx	                ;sx
 	jge	leftright
@@ -78,6 +78,7 @@ xmajor:
 	neg	cx                      ;sy
 leftright:
 	mov	WORD PTR [bp-12],cx	;sy
+;	mov	ax,WORD PTR [bp-14]	;dx2
 	shr	ax,1                    ;dx2/2
 	sub	di,ax                   ;err
 	mov	si,WORD PTR [bp+4]	;x1
@@ -102,7 +103,7 @@ xstep:
 ;
 ;
 ;
-ymajor:
+y_major:
 	mov	di,ax	                ;dx2
         or      cx,cx	                ;sy
 	jge	topbottom
@@ -117,6 +118,7 @@ ymajor:
 	neg	dx                      ;sx
 topbottom:
 	mov	WORD PTR [bp-10],dx	;sx
+;	mov	cx,WORD PTR [bp-20]	;dy2
         shr     bx,1                    ;dy2/2
 	sub	di,bx
 	mov	si,WORD PTR [bp+6]	;y1
@@ -147,7 +149,7 @@ exit:
 	mov	sp,bp
 	pop	bp
 	ret	
-_line	ENDP
+_pixline	ENDP
 _TEXT	ENDS
 END
 

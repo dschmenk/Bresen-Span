@@ -1,10 +1,6 @@
-/*
- * Copyright 2019, David Schmenk
- */
-
 #define FAST_MULDIV
 
-void fast_line(int x1, int y1, int x2, int y2)
+void line(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
     int shorterr, shortlen, longerr, longlen, halflen;

@@ -1,36 +1,12 @@
 #include <stdio.h>
 #include <conio.h>
-#include <bios.h>
 #include <dos.h>
+#include "rgb8.h"
 
-#define RGB2I(r,g,b)    (((b)&0xC0)|(((g)&0xE0)>>2)|(((r)&0xE0)>>5))
-
-static unsigned char far *vidmem = (unsigned char far *)0xA0000000L;
-static int orgmode;
-static unsigned int mapsel[] = {0x0102, 0x0202, 0x0402, 0x0802};
-signed char dithmatrix[4][4] =
-{
-    {  0, 25,   6, 31},
-    { 17,  8,  23, 14},
-    {  4, 29,   2, 27},
-    { 21, 12,  19, 10}
-};
-unsigned char mapr[256+32];
-unsigned char mapg[256+32];
-unsigned char mapb[256+64];
-unsigned red8, grn8, blu8, idx8;
 int leftedge[200], rightedge[200];
 int maxscan = 199;
 int minscan = 0;
 void (*fillspan)(int xl, int xr, int y);
-void (*hspan)(int xl, int xr, int y);
-void (*vspan)(int x, int yt, int yb);
-extern void hspan8rgb(int xl, int xr, int y);
-extern void vspan8rgb(int x, int yt, int yb);
-extern void pixel8rgb(int x, int y);
-extern void hspan8(int xl, int xr, int y);
-extern void vspan8(int x, int yt, int yb);
-extern void pixel8(int x, int y);
 
 unsigned long gettime(void)
 {
@@ -39,68 +15,9 @@ unsigned long gettime(void)
     _dos_gettime(&time);
     return time.hour * 360000UL + time.minute * 6000UL + time.second * 100UL + time.hsecond;
 }
-void setmodex(int modex, unsigned char noise)
-{
-    union REGS regs;
-    int shift, offset, x, y, red, grn, blu;
-    long c;
-
-    //
-    // Adjust dither matrix for noise
-    //
-    if (noise < 5)
-    {
-        shift  = 5 - noise;
-        offset = 16 - (16 >> shift);
-        for (y = 0; y < 4; y++)
-            for (x = 0; x < 4; x++)
-                dithmatrix[y][x] = (dithmatrix[y][x] >> shift) + offset;
-    }
-    //
-    // Fill RGB mapping arrays
-    //
-    for (c = 0; c < 256+32; c++)
-    {
-        mapr[c] = (((unsigned char)(c * 255 / (256+32))) >> 5);
-        mapg[c] = (((unsigned char)(c * 255 / (256+32))) >> 2) & 0x38;
-    }
-    for (c = 0; c < 256+64; c++)
-        mapb[c] = ((unsigned char)(c * 255 / (256+64))) & 0xC0;
-    //
-    // Get current mode
-    //
-    regs.x.ax = 0x0F00;
-    int86(0x10, &regs, &regs);
-    orgmode = regs.h.al;
-    regs.x.ax = 0x0013;
-    int86(0x10, &regs, &regs);
-    c = 0;
-    for (blu = 0; blu < 64; blu += 21)
-    {
-        for (grn = 0; grn < 64; grn += 9)
-        {
-            for (red = 0; red < 64; red += 9)
-            {
-                regs.x.ax = 0x1010;
-                regs.x.bx = c++;
-                regs.h.cl = blu;
-                regs.h.ch = grn;
-                regs.h.dh = red;
-                int86(0x10, &regs, &regs);
-            }
-        }
-    }
-}
-void restoremode(void)
-{
-    union REGS regs;
-
-    regs.x.ax = orgmode;
-    int86(0x10, &regs, &regs);
-}
 void hfill(int xl, int xr, int y)
 {
-    if (y > 0 && y < 199)
+    if (y >= 0 && y <= 199)
     {
         if (y < minscan) minscan = y;
         if (y > maxscan) maxscan = y;
@@ -110,53 +27,67 @@ void hfill(int xl, int xr, int y)
 }
 void vfill(int x, int yt, int yb)
 {
+    int i;
+
     if (yt < 0)   yt = 0;
     if (yb > 199) yb = 199;
-    while (yt <= yb)
+    for (i = yt; i <= yb; i++)
     {
-        if (yt < minscan) minscan = yt;
-        if (yt > maxscan) maxscan = yt;
-        if (leftedge[yt]  > x) leftedge[yt]  = x;
-        if (rightedge[yt] < x) rightedge[yt] = x;
-        yt++;
+        if (i < minscan) minscan = i;
+        if (i > maxscan) maxscan = i;
+        if (leftedge[i]  > x) leftedge[i]  = x;
+        if (rightedge[i] < x) rightedge[i] = x;
     }
 }
-void fill(int red, int grn, int blu)
+void polyfill(void)
 {
-    red8 = red; grn8 = grn; blu8 = blu; idx8=RGB2I(red8,grn8,blu8);
-    while (minscan <= maxscan)
+    int i;
+
+    for (i = minscan; i <= maxscan; i++)
     {
-        fillspan(leftedge[minscan], rightedge[minscan], minscan);
-        leftedge[minscan]  = 319;
-        rightedge[minscan] = 0;
-        minscan++;
+        if (leftedge[i]  < 0)   leftedge[i]  = 0;
+        if (rightedge[i] > 319) rightedge[i] = 319;
+        if (leftedge[i] <= rightedge[i])
+            fillspan(leftedge[i], rightedge[i], i);
+        leftedge[i]  = 320;
+        rightedge[i] = -1;
     }
     minscan = 199;
     maxscan = 0;
 }
 int main(int argc, char **argv)
 {
-    int c;
+    int c, f;
     int xv[3], yv[3], ix[3], iy[3];
     int rgb[3], irgb[3];
-    c = 5;
+    c = 1;
     if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'd')
     {
         c = argv[1][2] - '0';
         argc--;
         argv++;
     }
+    f = 1;
+    if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'f')
+    {
+        f = argv[1][2] - '0';
+        argc--;
+        argv++;
+    }
     setmodex(0x13, c);
-    if (c)
-        fillspan = hspan8rgb;
-    else
-        fillspan = hspan8;
-    hspan = hfill;
-    vspan = vfill;
+    /*
+     * Override span filling routines.
+     */
+    if (f)
+    {
+        fillspan = hspan;
+        hspan    = hfill;
+        vspan    = vfill;
+    }
     for (minscan = maxscan = 0; minscan < 200; minscan++)
     {
-        leftedge[minscan]  = 319;
-        rightedge[minscan] = 0;
+        leftedge[minscan]  = 320;
+        rightedge[minscan] = -1;
     }
     srand(gettime());
     for (c = 0; c < 3; c++)
@@ -170,10 +101,12 @@ int main(int argc, char **argv)
     }
     while (!kbhit())
     {
-        fast_line(xv[0], yv[0], xv[1], yv[1]);
-        fast_line(xv[1], yv[1], xv[2], yv[2]);
-        fast_line(xv[2], yv[2], xv[0], yv[0]);
-        fill(rgb[0], rgb[1], rgb[2]);
+        brush8rgb(rgb[0], rgb[1], rgb[2]);
+        line(xv[0], yv[0], xv[1], yv[1]);
+        line(xv[1], yv[1], xv[2], yv[2]);
+        line(xv[2], yv[2], xv[0], yv[0]);
+        if (f)
+            polyfill();
         for (c = 0; c < 3; c++)
         {
             xv[c] += ix[c];
