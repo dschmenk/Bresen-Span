@@ -6,7 +6,7 @@ There are many computer graphics papers written about improving upon the standar
 To start with, here is the simple, clean, and elegant algorithm as implemeted by Bresenham:
 
 ```
-void pixline(int x1, int y1, int x2, int y2)
+void line(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
 
