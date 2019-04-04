@@ -1,8 +1,11 @@
-# Bresen-Span: A Span based Bresenham line routine
+# Fast Lines
+------------
+
+## Bresen-Span: A Span based Bresenham line routine
 
 There are many computer graphics papers written about improving upon the standard Bresenham's line drawing algorithm to speed it up using horizontal and vertical spans of pixels, instead of the one-pixel-at-a-time approach. Often, the resulting algorithm seems more complicated than it needs to be. So I went back and wrote my own making as few changes to the original to keep it simple.
 
-## Pixel-At-A-Time Bresenham
+### Pixel-At-A-Time Bresenham
 To start with, here is the simple, clean, and elegant algorithm as implemeted by Bresenham:
 
 ```
@@ -52,7 +55,7 @@ I'm only going to show the X major axis code here, the Y axis is just reflected 
 
 I will assume there are no questions about the baseline Bresenham line algorithm. However, take note that the algorithm can be viewed as the long division of delta-major/delta-minor. The error term is really the running remainder, and every step results in a pixel along the major axis until the division completes with a remainder. The division restarts by moving along the minor axis and adding the dividend back in to the running remainder (error term). This is a bit of a simplification, but the concept is that the long division will only result in two integral spans of pixels, depending on the value of the running remainder (error term). We will take this in to account to write a routine that outputs spans based on the two span lengths: a short-span and a long-span.
 
-## Span-At-A-Time Bresenham
+### Span-At-A-Time Bresenham
 
 We will start off looking very much like the standard algorithm:
 ```
@@ -139,6 +142,10 @@ But now the initialization has been completed. Look at what happens next in the 
 ```
 Bam! That's it.
 
+The LINETEST.EXE and FILLTRI.EXE programs take an argument to disable the dithering '-d0' and the dithered brush routines will be replaced with the solid color. The solid color routines are much faster than the dithered color code. The FILLTRI.EXE program also takes a '-f0' argument to disable the triangle fill code and use the default span routines. Check out how the same line and span routines can be repurposed to implement a polygon fill routine:
+
+![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
+
 ## And now for something completely different: Anti Aliased Lines
 
 A fast anti-aliased line routine using Wu's algorithm. This is more of a DDA implementation that a pure Bresenham. Calculating the slope in a fixed 16.16 format provides the alpha component for free:
@@ -200,4 +207,7 @@ void aaline(int x1, int y1, int x2, int y2)
 
 You will find the complete routines and some sample routines in the form of an 8BPP framebuffer library in the source directory. Real-mode DOS binaries (VGA required) can be run inside DOSBox to see it in action with some timing. Depending on what hardware/emulation you use, the differences between the normal and fast lines may not look like much. A few reasons for this discrepency are that the span drawing routines are not incredibly optimized and are actually slower than the single pixel drawing for slopes near 1.0 due to setup overhead. Try replacing the drawing routines with empty, dummy routines to compare the actual speed of the line algorithms.
 
-The LINETEST.EXE and FILLTRI.EXE programs take an argument to disable the dithering '-d0' and the dithered brush routines will be replaced with the solid color. The solid color routines are much faster than the dithered color code. The FILLTRI.EXE program also takes a '-f0' argument to disable the triangle fill code and use the default span routines. Check out how the same line and span routines can be repurposed to implement a polygon fill routine.
+The LINETEST.EXE program now wraps up with a sampling of ati-aliased lines:
+
+![AALine](https://github.com/dschmenk/Bresen-Span/blob/master/images/aaline.png)
+
