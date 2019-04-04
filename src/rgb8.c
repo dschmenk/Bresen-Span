@@ -2,6 +2,11 @@
 #include <dos.h>
 
 #define RGB2I(r,g,b)    (((b)&0xC0)|(((g)&0xE0)>>2)|(((r)&0xE0)>>5))
+#define RED 0
+#define GRN 1
+#define BLU 2
+
+unsigned char far *vidmem = (unsigned char far *)0xA0000000L;
 static int orgmode, dithernoise;
 signed char dithmatrix[4][4] =
 {
@@ -13,10 +18,11 @@ signed char dithmatrix[4][4] =
 unsigned char mapr[256+32];
 unsigned char mapg[256+32];
 unsigned char mapb[256+64];
-unsigned char idx8, brush8[16];
+unsigned char idx8, rgb8[3], brush8[16];
 void (*hspan)(int xl, int xr, int y);
 void (*vspan)(int x, int yt, int yb);
 void (*pixel)(int x, int y);
+void (*aapixel)(int x, int y, int alpha);
 
 #if 0 // C or ASM pixels
 #include "pixspan8.c"
@@ -31,6 +37,29 @@ void pixel8(int x, int y);
 #if 0 // C or ASM line?
 #include "fastline.c"
 #endif
+void aapixel8(int x, int y, int alpha)
+{
+    int idx, ualpha, red, grn, blu;
+    int dither;
+    unsigned char far *pix;
+
+    if (alpha < 0x1F) return;
+    pix = vidmem + y * 320 + x;
+    if (alpha < 0xE0)
+    {
+        idx    = *pix;
+        alpha |= 0x1F;
+        ualpha = 0xFF ^ alpha;
+        red    = (rgb8[RED] * alpha + ((idx << 5) & 0xE0) * ualpha) >> 8;
+        grn    = (rgb8[GRN] * alpha + ((idx << 2) & 0xE0) * ualpha) >> 8;
+        blu    = (rgb8[BLU] * alpha +  (idx       & 0xC0) * ualpha) >> 8;
+        *pix = RGB2I(red, grn, blu);
+    }
+    else
+        *pix = RGB2I(rgb8[RED], rgb8[GRN], rgb8[BLU]);
+}
+
+#include "aaline.c"
 
 void setmodex(int modex, unsigned char noise)
 {
@@ -42,15 +71,17 @@ void setmodex(int modex, unsigned char noise)
 
     if ((dithernoise = noise))
     {
-        hspan = hspan8brush;
-        vspan = vspan8brush;
-        pixel = pixel8brush;
+        hspan   = hspan8brush;
+        vspan   = vspan8brush;
+        pixel   = pixel8brush;
+        aapixel = aapixel8;
     }
     else
     {
-        hspan = hspan8;
-        vspan = vspan8;
-        pixel = pixel8;
+        hspan   = hspan8;
+        vspan   = vspan8;
+        pixel   = pixel8;
+        aapixel = aapixel8;
     }
     //
     // Fill RGB mapping arrays
@@ -103,6 +134,9 @@ void brush8rgb(int red, int grn, int blu)
     int x, y, dither;
     unsigned char *brush;
 
+    rgb8[RED] = red;
+    rgb8[GRN] = grn;
+    rgb8[BLU] = blu;
     if (dithernoise)
     {
         brush = brush8;

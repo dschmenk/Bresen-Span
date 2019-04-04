@@ -139,6 +139,65 @@ But now the initialization has been completed. Look at what happens next in the 
 ```
 Bam! That's it.
 
+## And now for something completely different: Anti Aliased Lines
+
+A fast anti-aliased line routine using Wu's algorithm. This is more of a DDA implementation that a pure Bresenham. Calculating the slope in a fixed 16.16 format provides the alpha component for free:
+```
+void aaline(int x1, int y1, int x2, int y2)
+{
+    long inc, err;
+    int dx, dy, sx, sy, tmp, alpha;
+
+    sx = sy = 1;
+    if ((dx = x2 - x1) < 0)
+    {
+        sx = -1;
+        dx = -dx;
+    }
+    if ((dy = y2 - y1) < 0)
+    {
+        sy = -1;
+        dy = -dy;
+    }
+    if (dx >= dy)
+    {
+        if (dy == 0)
+        {
+            sx > 0 ? hspan8(x1, x2, y1) : hspan8(x2, x1, y1);
+            return;
+        }
+        inc = ((long)dy << 16) / dx;
+        err = inc - 0x00008000L; // 0.5 in 16.16 fixed point
+        while (x1 != x2)
+        {
+            alpha = (err >> 8);
+            if (alpha >= 0)
+                alpha = 0xFF;
+            else
+                alpha &= 0xFF;
+            aapixel(x1, y1, 0xFF^alpha);
+            aapixel(x1, y1 + sy, alpha);
+            if (err >= 0)
+            {
+                err -= 0x00010000L; // 1.0 in 16.16 fixed point
+                y1  += sy;
+            }
+            err += inc;
+            x1  += sx;
+        }
+        alpha = (err >> 8);
+        if (alpha >= 0)
+            alpha = 0xFF;
+        else
+            alpha &= 0xFF;
+        aapixel(x2, y2, 0xFF^alpha);
+        aapixel(x2, y2 + sy, alpha);
+    }
+    else // Y major
+    ...
+}
+```
+
 You will find the complete routines and some sample routines in the form of an 8BPP framebuffer library in the source directory. Real-mode DOS binaries (VGA required) can be run inside DOSBox to see it in action with some timing. Depending on what hardware/emulation you use, the differences between the normal and fast lines may not look like much. A few reasons for this discrepency are that the span drawing routines are not incredibly optimized and are actually slower than the single pixel drawing for slopes near 1.0 due to setup overhead. Try replacing the drawing routines with empty, dummy routines to compare the actual speed of the line algorithms.
 
 The LINETEST.EXE and FILLTRI.EXE programs take an argument to disable the dithering '-d0' and the dithered brush routines will be replaced with the solid color. The solid color routines are much faster than the dithered color code. The FILLTRI.EXE program also takes a '-f0' argument to disable the triangle fill code and use the default span routines. Check out how the same line and span routines can be repurposed to implement a polygon fill routine.

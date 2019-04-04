@@ -21,8 +21,9 @@ unsigned long gettime(void)
 }
 int main(int argc, char **argv)
 {
-    long int n, c;
-    unsigned long normtime, fasttime;
+    long int c;
+    int n;
+    unsigned long normtime, fasttime, aatime;
 
     c = 5;
     if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'd')
@@ -35,7 +36,7 @@ int main(int argc, char **argv)
     normtime = gettime();
     for (n = 0; n < 200; n++)
     {
-        c = n * 255 / 200;
+        c = n * 255L / 200;
         brush8rgb(0, c, 0);
         pixline(160, 100, 319, n);
         brush8rgb(255-c, 0, 0);
@@ -43,7 +44,7 @@ int main(int argc, char **argv)
     }
     for (n = 319; n >= 0; n--)
     {
-        c = n * 255 / 320;
+        c = n * 255L / 320;
         brush8rgb(0, 0, 255-c);
         pixline(160, 100, n,   0);
         brush8rgb(c, c, c);
@@ -64,7 +65,7 @@ int main(int argc, char **argv)
     fasttime = gettime();
     for (n = 0; n < 200; n++)
     {
-        c = n * 255 / 200;
+        c = n * 255L / 200;
         brush8rgb(0, c, 0);
         line(160, 100, 319, n);
         brush8rgb(255-c, 0, 0);
@@ -72,7 +73,7 @@ int main(int argc, char **argv)
     }
     for (n = 319; n >= 0; n--)
     {
-        c = n * 255 / 320;
+        c = n * 255L / 320;
         brush8rgb(0, 0, 255-c);
         line(160, 100, n,   0);
         brush8rgb(c, c, c);
@@ -90,8 +91,28 @@ int main(int argc, char **argv)
         line(160, 100, n, 199);
     }
     fasttime = gettime() - fasttime;
+    aatime = gettime();
+    for (n = 0; n < 200; n += 10)
+    {
+        c = n * 255L / 200;
+        brush8rgb(0, c, 0);
+        aaline(160, 100, 319, n);
+        brush8rgb(255-c, 0, 0);
+        aaline(160, 100,   0, n);
+    }
+
+    for (n = 319; n >= 0; n -= 10)
+    {
+        c = n * 255L / 320;
+        brush8rgb(0, 0, 255-c);
+        aaline(160, 100, n,   0);
+        brush8rgb(c, c, c);
+        aaline(160, 100, n, 199);
+    }
+    aatime = gettime() - aatime;
+    getch();
     restoremode();
-    printf("Normal line time = %lu\nFast line time = %lu\n", normtime, fasttime);
+    printf("Normal line time = %lu\nFast line time = %lu\nAnti-Alias line time = %lu\n", normtime, fasttime, aatime);
     return 0;
 }
 
