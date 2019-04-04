@@ -95,18 +95,18 @@ int main(int argc, char **argv)
     for (n = 0; n < 200; n += 10)
     {
         c = n * 255L / 200;
-        brush8rgb(0, c, 0);
+        brush8rgb(0, 255, 0);
         aaline(160, 100, 319, n);
-        brush8rgb(255-c, 0, 0);
+        brush8rgb(255, 0, 0);
         aaline(160, 100,   0, n);
     }
 
     for (n = 319; n >= 0; n -= 10)
     {
         c = n * 255L / 320;
-        brush8rgb(0, 0, 255-c);
+        brush8rgb(0, 0, 255);
         aaline(160, 100, n,   0);
-        brush8rgb(c, c, c);
+        brush8rgb(255, 255, 255);
         aaline(160, 100, n, 199);
     }
     aatime = gettime() - aatime;

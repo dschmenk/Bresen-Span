@@ -137,6 +137,7 @@ void brush8rgb(int red, int grn, int blu)
     rgb8[RED] = red;
     rgb8[GRN] = grn;
     rgb8[BLU] = blu;
+    idx8      = RGB2I(red, grn, blu);
     if (dithernoise)
     {
         brush = brush8;
@@ -147,8 +148,6 @@ void brush8rgb(int red, int grn, int blu)
                 *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
             }
     }
-    else
-        idx8 = RGB2I(red, grn, blu);
 }
 unsigned char dither8rgb(int x, int y, int red, int grn, int blu)
 {
