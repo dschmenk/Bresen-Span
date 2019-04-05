@@ -45,7 +45,6 @@ _line	PROC NEAR
 	mov	ax,WORD PTR [bp+8]	;x2
 	sub	ax,WORD PTR [bp+4]	;x1
 	shl	ax,1
-	or	ax,ax
 	jge	x_abs
         neg     dx	                ;sx
 	neg	ax                      ;dx2
@@ -53,7 +52,6 @@ x_abs:
 	mov	bx,WORD PTR [bp+10]	;y2
 	sub	bx,WORD PTR [bp+6]	;y1
 	shl	bx,1
-	or	bx,bx
 	jge	y_abs
         neg     cx	                ;sy
 	neg	bx                      ;dy2
@@ -79,7 +77,6 @@ x_major:
 	mov	WORD PTR [bp+10],si	;y2
 	neg	cx                      ;sy
 leftright:
-;	cmp	WORD PTR [bp-22],0	;dy2
         or      bx,bx                   ;dy2
 	jne	hsetup
 	push	WORD PTR [bp+6]	        ;y1

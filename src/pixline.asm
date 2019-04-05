@@ -43,7 +43,6 @@ _pixline        PROC NEAR
 	mov	ax,WORD PTR [bp+8]	;x2
 	sub	ax,WORD PTR [bp+4]	;x1
 	shl	ax,1
-	or	ax,ax
 	jge	x_abs
 	neg	dx                      ;sx
         neg     ax
@@ -51,7 +50,6 @@ x_abs:
 	mov	bx,WORD PTR [bp+10]	;y2
 	sub	bx,WORD PTR [bp+6]	;y1
 	shl	bx,1
-	or	bx,bx
 	jge	y_abs
 	neg     cx	                ;sy
 	neg	bx
@@ -78,7 +76,6 @@ x_major:
 	neg	cx                      ;sy
 leftright:
 	mov	WORD PTR [bp-12],cx	;sy
-;	mov	ax,WORD PTR [bp-14]	;dx2
 	shr	ax,1                    ;dx2/2
 	sub	di,ax                   ;err
 	mov	si,WORD PTR [bp+4]	;x1
@@ -118,7 +115,6 @@ y_major:
 	neg	dx                      ;sx
 topbottom:
 	mov	WORD PTR [bp-10],dx	;sx
-;	mov	cx,WORD PTR [bp-20]	;dy2
         shr     bx,1                    ;dy2/2
 	sub	di,bx
 	mov	si,WORD PTR [bp+6]	;y1
