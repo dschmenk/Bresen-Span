@@ -170,33 +170,29 @@ void aaline(int x1, int y1, int x2, int y2)
     {
         if (dy == 0)
         {
-            sx > 0 ? hspan8(x1, x2, y1) : hspan8(x2, x1, y1);
+            sx > 0 ? hspan(x1, x2, y1) : hspan(x2, x1, y1);
             return;
         }
-        inc = ((long)dy << 16) / dx;
-        err = inc - 0x00008000L; // 0.5 in 16.16 fixed point
+        inc   = ((long)dy << 16) / dx;
+        err   = inc - 0x00008000L; // 0.5 in 16.16 fixed point
+        alpha = err >= 0 ? 0 : 0x7F;
         while (x1 != x2)
         {
-            alpha = err >> 8;
-            if (alpha >= 0)
-                alpha = 0xFF;
-            else
-                alpha &= 0xFF;
             aapixel(x1, y1, 0xFF^alpha);
             aapixel(x1, y1 + sy, alpha);
             if (err >= 0)
             {
-                err -= 0x00010000L; // 1.0 in 16.16 fixed point
-                y1  += sy;
+                alpha = 0;
+                err  += inc - 0x00010000L; // 1.0 in 16.16 fixed point
+                y1   += sy;
             }
-            err += inc;
-            x1  += sx;
+            else
+            {
+                alpha  = ((int)err >> 8) & 0xFF;
+                err   += inc;
+            }
+            x1 += sx;
         }
-        alpha = err >> 8;
-        if (alpha >= 0)
-            alpha = 0xFF;
-        else
-            alpha &= 0xFF;
         aapixel(x2, y2, 0xFF^alpha);
         aapixel(x2, y2 + sy, alpha);
     }
