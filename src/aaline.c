@@ -25,7 +25,7 @@ void aaline(int x1, int y1, int x2, int y2)
         err = inc - 0x00008000L;
         while (x1 != x2)
         {
-            alpha = (err >> 8);
+            alpha = err >> 8;
             if (alpha >= 0)
                 alpha = 0xFF;
             else
@@ -40,7 +40,7 @@ void aaline(int x1, int y1, int x2, int y2)
             err += inc;
             x1  += sx;
         }
-        alpha = (err >> 8);
+        alpha = err >> 8;
         if (alpha >= 0)
             alpha = 0xFF;
         else
@@ -59,7 +59,7 @@ void aaline(int x1, int y1, int x2, int y2)
         err = inc - 0x00008000L;
         while (y1 != y2)
         {
-            alpha = (err >> 8);
+            alpha = err >> 8;
             if (alpha >= 0)
                 alpha = 0xFF;
             else
@@ -74,6 +74,7 @@ void aaline(int x1, int y1, int x2, int y2)
             err += inc;
             y1  += sy;
         }
+        alpha = err >> 8;
         if (alpha >= 0)
             alpha = 0xFF;
         else
