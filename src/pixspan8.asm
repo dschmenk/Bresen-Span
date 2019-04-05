@@ -50,16 +50,31 @@ _hspan8brush	PROC NEAR
         sub     cx,bx
 	and	bx,3
 	mov	al,BYTE PTR [si][bx]
+	mov	BYTE PTR es:[di],al
+	inc	di
+        or      cx,cx
+        jz      hbexit
         inc     bx
 	and	bx,3
 	mov	ah,BYTE PTR [si][bx]
+	mov	BYTE PTR es:[di],ah
+	inc	di
+        dec     cx
+        jz      hbexit
         inc     bx
 	and	bx,3
 	mov	dl,BYTE PTR [si][bx]
+	mov	BYTE PTR es:[di],dl
+	inc	di
+        dec     cx
+        jz      hbexit
         inc     bx
 	and	bx,3
 	mov	dh,BYTE PTR [si][bx]
-        inc     cx
+	mov	BYTE PTR es:[di],dh
+	inc	di
+        dec     cx
+        jz      hbexit
 hloopb:	mov	BYTE PTR es:[di],al
 	inc	di
         dec     cx
@@ -132,16 +147,31 @@ _vspan8brush	PROC NEAR
         shl     bx,1
         shl     bx,1
 	mov	al,BYTE PTR [si][bx]
+	mov	BYTE PTR es:[di],al
+	add	di,320
+        or      cx,cx
+	jz      vbexit
         add     bx,4
         and     bx,0Fh
 	mov	ah,BYTE PTR [si][bx]
+	mov	BYTE PTR es:[di],ah
+	add	di,320
+        dec     cx
+	jz      vbexit
         add     bx,4
         and     bx,0Fh
 	mov	dl,BYTE PTR [si][bx]
+	mov	BYTE PTR es:[di],dl
+	add	di,320
+        dec     cx
+	jz      vbexit
         add     bx,4
         and     bx,0Fh
 	mov	dh,BYTE PTR [si][bx]
-        inc     cx
+	mov	BYTE PTR es:[di],dh
+	add	di,320
+        dec     cx
+	jz      vbexit
 vloopb:	mov	BYTE PTR es:[di],al
 	add	di,320
         dec     cx
