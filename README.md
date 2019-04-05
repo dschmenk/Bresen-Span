@@ -148,7 +148,7 @@ The LINETEST.EXE and FILLTRI.EXE programs take an argument to disable the dither
 
 ## And now for something completely different: Anti Aliased Lines
 
-A fast anti-aliased line routine using Wu's algorithm. This is more of a DDA implementation that a pure Bresenham. Calculating the slope in a fixed 16.16 format provides the alpha component for free:
+A fast anti-aliased line routine using Wu's algorithm. This is more of a DDA implementation than a pure Bresenham. Calculating the slope in a 16.16 fixed point format provides the alpha component for free:
 ```
 void aaline(int x1, int y1, int x2, int y2)
 {
@@ -207,7 +207,7 @@ void aaline(int x1, int y1, int x2, int y2)
 
 You will find the complete routines and some sample routines in the form of an 8BPP framebuffer library in the source directory. Real-mode DOS binaries (VGA required) can be run inside DOSBox to see it in action with some timing. Depending on what hardware/emulation you use, the differences between the normal and fast lines may not look like much. A few reasons for this discrepency are that the span drawing routines are not incredibly optimized and are actually slower than the single pixel drawing for slopes near 1.0 due to setup overhead. Try replacing the drawing routines with empty, dummy routines to compare the actual speed of the line algorithms.
 
-The LINETEST.EXE program now wraps up with a sampling of ati-aliased lines:
+The LINETEST.EXE program now wraps up with a sampling of anti-aliased lines:
 
 ![AALine](https://github.com/dschmenk/Bresen-Span/blob/master/images/aaline.png)
 
