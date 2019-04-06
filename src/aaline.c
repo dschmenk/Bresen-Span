@@ -18,7 +18,7 @@ void aaline(int x1, int y1, int x2, int y2)
     {
         if (dy == 0)
         {
-            for (x2 += sx;x1 != x2; x1 += sx) aapixel(x1, y1, 0xFF);
+            sx > 0 ? aahspan(x1, x2, y1) : aahspan(x2, x1, y1);
             return;
         }
         inc           = ((long)dy << 16) / dx;
@@ -49,7 +49,7 @@ void aaline(int x1, int y1, int x2, int y2)
     {
         if (dx == 0)
         {
-            for (y2 += sy;y1 != y2; y1 += sy) aapixel(x1, y1, 0xFF);
+            sy > 0 ? aavspan(x1, y1, y2) : aavspan(x1, y2, y1);
             return;
         }
         inc           = ((long)dx << 16) / dy;
@@ -77,5 +77,4 @@ void aaline(int x1, int y1, int x2, int y2)
         aapixel(x2 + sx, y2, alpha);
     }
 }
-
 

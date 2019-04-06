@@ -9,12 +9,11 @@ void setmodex(int modex, unsigned char noise);
 void restoremode(void);
 void brush8rgb(int red, int grn, int blu);
 void pixel8rgb(int x, int y, int red, int grn, int blu);
+void pixel8alpha(int x, int y, int alpha);
 unsigned char dither8rgb(int x, int y, int red, int grn, int blu);
 extern void (*hspan)(int xl, int xr, int y);
 extern void (*vspan)(int x, int yt, int yb);
 extern void (*pixel)(int x, int y);
 extern void (*aapixel)(int x, int y, int alpha);
 #define RGB2I(r,g,b)    (((b)&0xC0)|(((g)&0xE0)>>2)|(((r)&0xE0)>>5))
-
-
 

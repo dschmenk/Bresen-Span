@@ -61,5 +61,21 @@ void pixel8rgb(int x, int y, int red, int grn, int blu)
     dither              = dithmatrix[y & 3][x & 3];
     vidmem[y * 320 + x] = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
 }
+void pixel8alpha(int x, int y, int alpha)
+{
+    int idx;
+    unsigned char far *pix;
 
+    if (!(alpha >>= 5)) return; // Scale for the limited 3-3-2 RGB palette
+    if (alpha < 0x07) // Could technically remove last row of mul arrays
+    {
+        pix    = vidmem + y * 320 + x;
+        idx    = *pix;
+        *pix   = amulr[alpha][rgb8[RED] >> 5] + amulr[0x07^alpha][ idx       & 0x07]
+               | amulg[alpha][rgb8[GRN] >> 5] + amulg[0x07^alpha][(idx >> 3) & 0x07]
+               | amulb[alpha][rgb8[BLU] >> 6] + amulb[0x07^alpha][(idx >> 6) & 0x03];
+    }
+    else
+        *(vidmem + y * 320 + x) = idx8;
+}
 

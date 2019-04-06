@@ -23,6 +23,8 @@ void (*hspan)(int xl, int xr, int y);
 void (*vspan)(int x, int yt, int yb);
 void (*pixel)(int x, int y);
 void (*aapixel)(int x, int y, int alpha);
+void (*aahspan)(int xl, int xr, int y);
+void (*aavspan)(int x, int yt, int yb);
 
 #if 0 // C or ASM pixels
 #include "pixspan8.c"
@@ -33,6 +35,8 @@ void pixel8brush(int x, int y);
 void hspan8(int xl, int xr, int y);
 void vspan8(int x, int yt, int yb);
 void pixel8(int x, int y);
+void pixel8rgb(int x, int y, int red, int grn, int blu);
+void pixel8alpha(int x, int y, int alpha);
 #endif
 #if 0 // C or ASM line?
 #include "fastline.c"
@@ -72,24 +76,7 @@ unsigned char amulb[8][4] = // Above table shifted left by 2
 	{0x00, 0x40, 0x40, 0x80}, 
 	{0x00, 0x40, 0x80, 0xC0}, 
 	{0x00, 0x40, 0x80, 0xC0}
-};	
-void aapixel8(int x, int y, int alpha)
-{
-    int idx;
-    unsigned char far *pix;
-
-    if (!(alpha >>= 5)) return; // Scale for the limited 3-3-2 RGB palette
-    if (alpha < 0x07) // Could technically remove last row of mul arrays
-    {
-        pix    = vidmem + y * 320 + x;
-        idx    = *pix;
-        *pix   = amulr[alpha][rgb8[RED] >> 5] + amulr[0x07^alpha][ idx       & 0x07]
-               | amulg[alpha][rgb8[GRN] >> 5] + amulg[0x07^alpha][(idx >> 3) & 0x07]
-               | amulb[alpha][rgb8[BLU] >> 6] + amulb[0x07^alpha][(idx >> 6) & 0x03];
-    }
-    else
-        *(vidmem + y * 320 + x) = idx8;
-}
+};
 
 #include "aaline.c"
 
@@ -101,19 +88,20 @@ void setmodex(int modex, unsigned char noise)
     long c;
     unsigned char colors[256*3], far *far_colors;
 
+    aapixel = pixel8alpha;
+    aahspan = hspan8;
+    aavspan = vspan8; 
     if ((dithernoise = noise))
     {
         hspan   = hspan8brush;
         vspan   = vspan8brush;
         pixel   = pixel8brush;
-        aapixel = aapixel8;
     }
     else
     {
         hspan   = hspan8;
         vspan   = vspan8;
         pixel   = pixel8;
-        aapixel = aapixel8;
     }
     //
     // Fill RGB mapping arrays
