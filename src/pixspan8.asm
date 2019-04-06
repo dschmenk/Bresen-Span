@@ -365,7 +365,7 @@ aamix:  and     si,00E0h
         and     bl,07h
         xor     si,0038h
         add     al,BYTE PTR _amulg[bx][si]
-	mov	bl,BYTE PTR _rgb8+3     ;blu
+	mov	bl,BYTE PTR _rgb8+2     ;blu
         inc     cl
         shr     bl,cl
         shr     si,1
