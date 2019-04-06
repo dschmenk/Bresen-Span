@@ -19,28 +19,6 @@ unsigned char mapr[256+32];
 unsigned char mapg[256+32];
 unsigned char mapb[256+64];
 unsigned char idx8, rgb8[3], brush8[16];
-void (*hspan)(int xl, int xr, int y);
-void (*vspan)(int x, int yt, int yb);
-void (*pixel)(int x, int y);
-void (*aapixel)(int x, int y, int alpha);
-void (*aahspan)(int xl, int xr, int y);
-void (*aavspan)(int x, int yt, int yb);
-
-#if 0 // C or ASM pixels
-#include "pixspan8.c"
-#else
-void hspan8brush(int xl, int xr, int y);
-void vspan8brush(int x, int yt, int yb);
-void pixel8brush(int x, int y);
-void hspan8(int xl, int xr, int y);
-void vspan8(int x, int yt, int yb);
-void pixel8(int x, int y);
-void pixel8rgb(int x, int y, int red, int grn, int blu);
-void pixel8alpha(int x, int y, int alpha);
-#endif
-#if 0 // C or ASM line?
-#include "fastline.c"
-#endif
 //
 // Clamped and shifted Alpha*RGB multiplication tables.
 //
@@ -77,9 +55,29 @@ unsigned char amulb[8][4] = // Above table shifted left by 2
 	{0x00, 0x40, 0x80, 0xC0}, 
 	{0x00, 0x40, 0x80, 0xC0}
 };
+void (*hspan)(int xl, int xr, int y);
+void (*vspan)(int x, int yt, int yb);
+void (*pixel)(int x, int y);
+void (*aapixel)(int x, int y, int alpha);
+void (*aahspan)(int xl, int xr, int y);
+void (*aavspan)(int x, int yt, int yb);
 
+#if 0 // C or ASM pixels
+#include "pixspan8.c"
+#else
+void hspan8brush(int xl, int xr, int y);
+void vspan8brush(int x, int yt, int yb);
+void pixel8brush(int x, int y);
+void hspan8(int xl, int xr, int y);
+void vspan8(int x, int yt, int yb);
+void pixel8(int x, int y);
+void pixel8rgb(int x, int y, int red, int grn, int blu);
+void pixel8alpha(int x, int y, int alpha);
+#endif
+#if 0 // C or ASM line?
+#include "fastline.c"
 #include "aaline.c"
-
+#endif
 void setmodex(int modex, unsigned char noise)
 {
     union  REGS  regs;

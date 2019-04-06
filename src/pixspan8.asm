@@ -153,30 +153,30 @@ _vspan8brush	PROC NEAR
         add     si,OFFSET _brush8
 	mov	cx,WORD PTR [bp+8]	;yb
         sub     cx,bx
-	and	bx,3
         shl     bx,1
         shl     bx,1
+	and	bx,000Ch
 	mov	al,BYTE PTR [si][bx]
 	mov	BYTE PTR es:[di],al
         or      cx,cx
 	jz      vbexit
 	add	di,320
-        add     bx,4
-        and     bx,0Fh
+        add     bl,4
+        and     bl,0Ch
 	mov	ah,BYTE PTR [si][bx]
 	mov	BYTE PTR es:[di],ah
         dec     cx
 	jz      vbexit
 	add	di,320
-        add     bx,4
-        and     bx,0Fh
+        add     bl,4
+        and     bl,0Ch
 	mov	dl,BYTE PTR [si][bx]
 	mov	BYTE PTR es:[di],dl
         dec     cx
 	jz      vbexit
 	add	di,320
-        add     bx,4
-        and     bx,0Fh
+        add     bl,4
+        and     bl,0Ch
 	mov	dh,BYTE PTR [si][bx]
 	mov	BYTE PTR es:[di],dh
         dec     cx
