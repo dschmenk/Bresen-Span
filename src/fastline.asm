@@ -90,11 +90,11 @@ hsetup:
 	mov	WORD PTR [bp-2],si	;ps
         shr     ax,1                    ;dx2/2
 	mov	cx,ax
-	cwd	
-	idiv	bx                      ;dy2
+	xor     dx,dx
+	div	bx                      ;dy2
 	add	si,ax	                ;x1+=halflen
 	inc	ax
-	imul	bx                      ;dy2
+	mul	bx                      ;dy2
 	sub	ax,cx                   ;dx2/2
 	mov	cx,ax	                ;err
 	mov	dx,si	                ;x1
@@ -175,11 +175,11 @@ vsetup:
         mov	cx,ax	                ;dx2
         shr     bx,1                    ;dy2/2
 	mov	ax,bx
-	cwd	
-	idiv	cx
+	xor     dx,dx
+	div	cx
 	add	si,ax	                ;y1+=halflen
 	inc	ax
-	imul	cx
+	mul	cx
 	sub	ax,bx
 	mov	bx,ax	                ;err
 	mov	dx,si	                ;y1

@@ -38,58 +38,52 @@ _aaline	PROC NEAR
 ;	dx = -22
 ;	dy = -24
 ;	sx = -18
-	mov	ax,1
-	mov	WORD PTR [bp-20],ax	;sy
-	mov	WORD PTR [bp-18],ax	;sx
+	mov	dx,1
+        mov     cx,dx
 	mov	ax,WORD PTR [bp+8]	;x2
 	sub	ax,WORD PTR [bp+4]	;x1
+	jge	x_abs
+        neg     dx	                ;sx
+	neg	ax                      ;dx
+x_abs:
+	mov	bx,WORD PTR [bp+10]	;y2
+	sub	bx,WORD PTR [bp+6]	;y1
+	jge	y_abs
+        neg     cx	                ;sy
+	neg	bx                      ;dy
+y_abs:
 	mov	WORD PTR [bp-22],ax	;dx
-	or	ax,ax
-	jge	$I323
-	mov	WORD PTR [bp-18],-1	;sx
-	neg	ax
-	mov	WORD PTR [bp-22],ax	;dx
-$I323:
-	mov	ax,WORD PTR [bp+10]	;y2
-	sub	ax,WORD PTR [bp+6]	;y1
-	mov	WORD PTR [bp-24],ax	;dy
-	or	ax,ax
-	jge	$I324
-	mov	WORD PTR [bp-20],-1	;sy
-	neg	ax
-	mov	WORD PTR [bp-24],ax	;dy
-$I324:
-	mov	ax,WORD PTR [bp-24]	;dy
-	cmp	WORD PTR [bp-22],ax	;dx
-	jge	$JCC69
-	jmp	$I325
-$JCC69:
-	or	ax,ax
-	jne	$I326
-	cmp	WORD PTR [bp-18],0	;sx
-	jle	$L20000
+	mov	WORD PTR [bp-24],bx	;dy
+	mov	WORD PTR [bp-18],dx	;sx
+        mov     WORD PTR [bp-20],cx     ;sy
+	cmp	ax,bx	                ;dx>=dy?
+	jge	x_major
+	jmp	y_major
+;
+;
+;
+x_major:        
+        or      bx,bx                   ;dy
+	jne	hsetup
 	push	WORD PTR [bp+6]	        ;y1
-	push	WORD PTR [bp+8]	        ;x2
-	push	WORD PTR [bp+4]	        ;x1
-$L20033:
-	call	WORD PTR _aahspan
-	jmp	$L20030
-$L20000:
-	push	WORD PTR [bp+6]	        ;y1
-	push	WORD PTR [bp+4]	        ;x1
-	push	WORD PTR [bp+8]	        ;x2
-	jmp	SHORT $L20033
-	nop	
-$I326:
+	or	dx,dx	                ;sx
+        jle     hrev
+        push	WORD PTR [bp+8]	        ;x2
+        push	WORD PTR [bp+4]	        ;x1
+        jmp     SHORT hspan
+hrev:   push	WORD PTR [bp+4]	        ;x1
+        push	WORD PTR [bp+8]	        ;x2
+hspan:	call	WORD PTR _aahspan
+	jmp	exit
+hsetup:
         mov     dx,WORD PTR [bp-24]     ;dy
 	xor	ax,ax
 	mov	bx,WORD PTR [bp-22]	;dx
         cmp     dx,bx
-        jne     notdiag
+        jne     nodiag
         mov     dx,1
         jmp     SHORT diag
-notdiag:
-	div	bx	                ;dx
+nodiag:	div	bx	                ;dx
         xor     dx,dx
 diag:	mov	WORD PTR [bp-16],ax	;inc
 	mov	WORD PTR [bp-14],dx
@@ -99,90 +93,85 @@ diag:	mov	WORD PTR [bp-16],ax	;inc
 	mov	WORD PTR [bp-6],dx
 	mov	ax,WORD PTR [bp-16]	;inc
 	mov	dx,WORD PTR [bp-14]
-	sub	ax,-32768
+	sub	ax,08000h
 	sbb	dx,0
-	mov	WORD PTR [bp-12],ax	;err
-	mov	WORD PTR [bp-10],dx
+        mov     si,ax                   ;errL
+        mov     di,dx                   ;errH
 	or	dx,dx
-	jl	$L20002
-	sub	ax,ax
-	jmp	SHORT $L20003
-$L20002:
-	mov	ax,127
-$L20003:
-	mov	di,ax
-	mov	si,WORD PTR [bp+4]	;x1
-	jmp	SHORT $L20006
-$I330:
-	mov	al,BYTE PTR [bp-11]
-	sub	ah,ah
-	mov	di,ax
-	mov	ax,WORD PTR [bp-16]	;inc
-	mov	dx,WORD PTR [bp-14]
-	add	WORD PTR [bp-12],ax	;err
-	adc	WORD PTR [bp-10],dx
-$I331:
-	add	si,WORD PTR [bp-18]	;sx
-$L20006:
-	cmp	si,WORD PTR [bp+8]	;x2
-	je	$L20005
-	mov	ax,di
+	jl	hhalf
+	xor	ax,ax
+	jmp	SHORT halpha
+hhalf:	mov	ax,007Fh
+halpha:	mov	bx,WORD PTR [bp+4]	;x1
+	cmp	bx,WORD PTR [bp+8]	;x2
+	je	hend
+hloop:
+	push	ax                      ;alpha for second call to aapix
 	xor	al,255
-	push	ax
+	push	ax                      ;alpha
 	push	WORD PTR [bp+6]	        ;y1
-	push	si
+        push    bx                      ;x1
 	call	WORD PTR _aapixel
 	add	sp,6
-	push	di
 	mov	ax,WORD PTR [bp+6]	;y1
 	add	ax,WORD PTR [bp-20]	;sy
 	push	ax
-	push	si
+	push    WORD PTR [bp+4]	        ;x1
 	call	WORD PTR _aapixel
 	add	sp,6
-	cmp	WORD PTR [bp-10],0
-	jl	$I330
-	sub	di,di
-	mov	ax,WORD PTR [bp-8]	;inc_minus_one
-	mov	dx,WORD PTR [bp-6]
-	add	WORD PTR [bp-12],ax	;err
-	adc	WORD PTR [bp-10],dx
-	mov	ax,WORD PTR [bp-20]	;sy
-	add	WORD PTR [bp+6],ax	;y1
-	jmp	SHORT $I331
-	nop	
-$L20005:
-	mov	WORD PTR [bp-4],di	;alpha
-	mov	WORD PTR [bp+4],si	;x1
-	mov	ax,di
+        or      di,di
+	jge	hnext
+hstep:  mov     ax,si
+        mov     al,ah
+        xor     ah,ah
+	add	si,WORD PTR [bp-16]	;inc
+	adc	di,WORD PTR [bp-14]
+	mov	bx,WORD PTR [bp+4]	;x1
+	add	bx,WORD PTR [bp-18]	;sx
+	mov	WORD PTR [bp+4],bx	;x1
+	cmp	bx,WORD PTR [bp+8]	;x2
+	jne	hloop
+        jmp     SHORT hend
+hnext:	xor	ax,ax
+	add	si,WORD PTR [bp-8]	;inc_minus_one
+	adc	di,WORD PTR [bp-6]
+	mov	bx,WORD PTR [bp-20]	;sy
+	add	WORD PTR [bp+6],bx	;y1
+	mov	bx,WORD PTR [bp+4]	;x1
+	add	bx,WORD PTR [bp-18]	;sx
+	mov	WORD PTR [bp+4],bx	;x1
+	cmp	bx,WORD PTR [bp+8]	;x2
+	jne	hloop
+hend:
+	push	ax                      ;alpha for second call to aapix
 	xor	al,255
-	push	ax
+	push	ax                      ;alpha
 	push	WORD PTR [bp+10]	;y2
 	push	WORD PTR [bp+8]	        ;x2
 	call	WORD PTR _aapixel
 	add	sp,6
-	push	di
 	mov	ax,WORD PTR [bp+10]	;y2
 	add	ax,WORD PTR [bp-20]	;sy
 	push	ax
 	push	WORD PTR [bp+8]	        ;x2
-	jmp	$L20028
-$I325:
-	cmp	WORD PTR [bp-22],0	;dx
-	jne	$I333
-	cmp	WORD PTR [bp-20],0	;sy
-	jle	$L20008
+	jmp	aexit
+;
+;
+;
+y_major:
+        or      ax,ax                   ;dx
+	jne	vsetup
+	or	cx,cx	                ;sy
+        jle     vrev
 	push	WORD PTR [bp+10]	;y2
 	push	WORD PTR [bp+6]	        ;y1
-$L20034:
-	push	WORD PTR [bp+4]	        ;x1
+        jmp     SHORT vspan
+vrev:	push	WORD PTR [bp+6]	        ;y1
+	push	WORD PTR [bp+10]	;y2
+vspan:  push	WORD PTR [bp+4]	        ;x1
 	call	WORD PTR _aavspan
-	jmp	$L20030
-$L20008:
-	push	WORD PTR [bp+6]	        ;y1
-	push	WORD PTR [bp+10]	;y2
-	jmp	SHORT $L20034
-$I333:
+	jmp	exit
+vsetup:
 	mov	dx,WORD PTR [bp-22]	;dx
 	xor	ax,ax
 	div	WORD PTR [bp-24]        ;dx/dy
@@ -195,77 +184,69 @@ $I333:
 	mov	WORD PTR [bp-6],dx
 	mov	ax,WORD PTR [bp-16]	;inc
 	mov	dx,WORD PTR [bp-14]
-	sub	ax,-32768
+	sub	ax,08000h
 	sbb	dx,0
-	mov	WORD PTR [bp-12],ax	;err
-	mov	WORD PTR [bp-10],dx
+        mov     si,ax                   ;errL
+        mov     di,dx                   ;errH
 	or	dx,dx
-	jl	$L20010
-	sub	ax,ax
-	jmp	SHORT $L20011
-$L20010:
-	mov	ax,127
-$L20011:
-	mov	di,ax
-	mov	si,WORD PTR [bp+6]	;y1
-	jmp	SHORT $L20014
-$I337:
-	mov	al,BYTE PTR [bp-11]
-	sub	ah,ah
-	mov	di,ax
-	mov	ax,WORD PTR [bp-16]	;inc
-	mov	dx,WORD PTR [bp-14]
-	add	WORD PTR [bp-12],ax	;err
-	adc	WORD PTR [bp-10],dx
-$I338:
-	add	si,WORD PTR [bp-20]	;sy
-$L20014:
-	cmp	si,WORD PTR [bp+10]	;y2
-	je	$L20013
-	mov	ax,di
+	jl	vhalf
+	xor	ax,ax
+	jmp	SHORT valpha
+vhalf:	mov	ax,007Fh
+valpha:	mov	bx,WORD PTR [bp+6]	;y1
+	cmp	bx,WORD PTR [bp+10]	;y2
+	je	vend
+vloop:
+	push	ax                      ;alpha for second call to aapix
 	xor	al,255
-	push	ax
-	push	si
+	push	ax                      ;alpha
+	push	bx                      ;y1
 	push	WORD PTR [bp+4]	        ;x1
 	call	WORD PTR _aapixel
 	add	sp,6
-	push	di
-	push	si
+	push	WORD PTR [bp+6]	        ;y1
 	mov	ax,WORD PTR [bp+4]	;x1
 	add	ax,WORD PTR [bp-18]	;sx
 	push	ax
 	call	WORD PTR _aapixel
 	add	sp,6
-	cmp	WORD PTR [bp-10],0
-	jl	$I337
-	sub	di,di
-	mov	ax,WORD PTR [bp-8]	;inc_minus_one
-	mov	dx,WORD PTR [bp-6]
-	add	WORD PTR [bp-12],ax	;err
-	adc	WORD PTR [bp-10],dx
-	mov	ax,WORD PTR [bp-18]	;sx
-	add	WORD PTR [bp+4],ax	;x1
-	jmp	SHORT $I338
-	nop	
-$L20013:
-	mov	WORD PTR [bp-4],di	;alpha
-	mov	WORD PTR [bp+6],si	;y1
-	mov	ax,di
+        or      di,di
+	jge	vnext
+vstep:  mov     ax,si
+        mov     al,ah
+        xor     ah,ah
+	add	si,WORD PTR [bp-16]	;inc
+	adc	di,WORD PTR [bp-14]
+	mov	bx,WORD PTR [bp+6]	;y1
+	add	bx,WORD PTR [bp-20]	;sy
+	mov	WORD PTR [bp+6],bx	;y1
+	cmp	bx,WORD PTR [bp+10]	;y2
+	jne	vloop
+	jmp	SHORT vend
+vnext:  xor	ax,ax
+	add	si,WORD PTR [bp-8]	;inc_minus_one
+	adc	di,WORD PTR [bp-6]
+	mov	bx,WORD PTR [bp-18]	;sx
+	add	WORD PTR [bp+4],bx	;x1
+	mov	bx,WORD PTR [bp+6]	;y1
+	add	bx,WORD PTR [bp-20]	;sy
+	mov	WORD PTR [bp+6],bx	;y1
+	cmp	bx,WORD PTR [bp+10]	;y2
+	jne	vloop
+vend:
+	push	ax                      ;alpha for second call to aapix
 	xor	al,255
-	push	ax
+	push	ax                      ;alpha
 	push	WORD PTR [bp+10]	;y2
 	push	WORD PTR [bp+8]	        ;x2
 	call	WORD PTR _aapixel
 	add	sp,6
-	push	di
 	push	WORD PTR [bp+10]	;y2
 	mov	ax,WORD PTR [bp+8]	;x2
 	add	ax,WORD PTR [bp-18]	;sx
 	push	ax
-$L20028:
-	call	WORD PTR _aapixel
-$L20030:
-	add	sp,6
+aexit:	call	WORD PTR _aapixel
+exit:	add	sp,6
 	pop	si
 	pop	di
 	mov	sp,bp
@@ -275,3 +256,4 @@ $L20030:
 _aaline	ENDP
 _TEXT	ENDS
 END
+
