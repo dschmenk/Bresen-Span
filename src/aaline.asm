@@ -107,7 +107,7 @@ halpha:	mov	bx,WORD PTR [bp+4]	;x1
 	je	hend
 hloop:
 	push	ax                      ;alpha for second call to aapix
-	xor	al,255
+	not	al
 	push	ax                      ;alpha
 	push	WORD PTR [bp+6]	        ;y1
         push    bx                      ;x1
@@ -144,7 +144,7 @@ hnext:	xor	ax,ax
 	jne	hloop
 hend:
 	push	ax                      ;alpha for second call to aapix
-	xor	al,255
+	not	al
 	push	ax                      ;alpha
 	push	WORD PTR [bp+10]	;y2
 	push	WORD PTR [bp+8]	        ;x2
@@ -198,7 +198,7 @@ valpha:	mov	bx,WORD PTR [bp+6]	;y1
 	je	vend
 vloop:
 	push	ax                      ;alpha for second call to aapix
-	xor	al,255
+	not	al
 	push	ax                      ;alpha
 	push	bx                      ;y1
 	push	WORD PTR [bp+4]	        ;x1
@@ -235,7 +235,7 @@ vnext:  xor	ax,ax
 	jne	vloop
 vend:
 	push	ax                      ;alpha for second call to aapix
-	xor	al,255
+	not	al
 	push	ax                      ;alpha
 	push	WORD PTR [bp+10]	;y2
 	push	WORD PTR [bp+8]	        ;x2
