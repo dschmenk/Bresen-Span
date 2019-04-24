@@ -8,7 +8,9 @@ EGA: 320x200x4 maps RGB to 16 IRGB colors. When connected to a monochrome monito
 
 VGA: 320x200x8 maps RGB colors to a 3-3-2 RGB colormap. For monochrome, a 64 level grey ramp is programmed into the color registers.
 
-The library will auto-detect the graphics adapter and select the mode with the most colors. The library has a few options to control the adapter selection and the color mapping mode. By default, the library wil dither the RGB colors to the best colors the adapter can disply. FOr CGA, this is monochrome ony. The EGA and VGA can output to either color or monochrome monitors. The dithering can be disabled to use a best-match color, greatly reducing color fideltity, but with a slight speed improvement for EGA and VGA. The librarby can also be forced to use a lesser color depth than what the hardware may support.
+The library will auto-detect the graphics adapter and select the mode with the most colors. The library has a few options to control the adapter selection and the color mapping mode. By default, the library wil dither the RGB colors to the best colors the adapter can disply. FOr CGA, this is monochrome ony. The EGA and VGA can output to either color or monochrome monitors. The dithering can be disabled to use a best-match color, greatly reducing color fidelity, but with a slight speed improvement for EGA and VGA. The library can also be forced to use a lesser color depth than what the hardware may support.
+
+Page flipping is supported by allowing two pages in graphics memory to be rendered and displayed (except the CGA). The CGA will allocate a main memory buffer and do a copy to video memory during a page flip. Normally this is without issue unless you are expecting the contents of the previous front page to now be the contents of the back page. Look at LINETEST.EXE to see where this breaks down at the end of the program.
 
 Sample programs: These programs just demonstrate the abilities of the library. There are common command line options to control the libraries features.
 
@@ -18,8 +20,9 @@ Sample programs: These programs just demonstrate the abilities of the library. T
     -d4 : use 4 BPP mode
     -d8 : use 8 BPP mode (default)
     
-trifill.exe has an additional flag to control filling.
+TRIFILL.EXE has additional flags to control filling and double buffering.
 
     -f0 : disable fill mode
+    -b  : buffer the rendering to back buffer and flip on VSYNC to display
     
-showpbm.exe also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
+SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
