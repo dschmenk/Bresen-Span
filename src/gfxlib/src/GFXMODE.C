@@ -26,6 +26,7 @@ int gfxmode8(int mono);
 int gfxmode4(int mono);
 int gfxmode2(int mono);
 void gfxrender(int page);
+void bitblt(int xl, int yt, int width, int height, int xoffset, int yoffset, unsigned char far *src, int pitch);
 
 int gfxmode(int modeflags)
 {
@@ -149,6 +150,15 @@ void endfill(void)
      */
     hspan   = fillhspan;
     vspan   = fillvspan;
+}
+void text(int x, int y, char *string)
+{
+    while (*string)
+    {
+        bitblt(x, y, 8, 8, ((unsigned char)*string) * 64, 0, (unsigned char far *)0xFFA6000EL, 1);
+        string++;
+        x += 8;
+    }
 }
 
 

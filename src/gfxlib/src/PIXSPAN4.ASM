@@ -84,7 +84,7 @@ _hspan4brush	PROC NEAR
         mov     dx,03CEh                ;write mode 2
         mov     ax,0205h
         out     dx,ax
-        and     cx,7
+        and     cx,0007h
         mov     bx,cx
         shl     bx,1
         mov     ax,WORD PTR _pixmask[bx]
@@ -93,7 +93,7 @@ _hspan4brush	PROC NEAR
         shr     dl,cl                   ;mask
         shl     si,1
         shl     si,1
-        and     cl,3
+        and     cl,03h
         add     si,cx
         mov     al,BYTE PTR _packbrush4[si]
 	mov	ah,BYTE PTR es:[di]    ;latches
@@ -104,11 +104,11 @@ _hspan4brush	PROC NEAR
         ret
 hbwide: xor     dx,dx
         not     dx
-        and     cl,7                    ;xl
+        and     cl,07h                  ;xl
         shr     dl,cl                   ;lmask
         mov     cl,bl                   ;xr
         not     cl
-        and     cl,7
+        and     cl,07h
         shl     dh,cl                   ;rmask
         shr     bx,1
         shr     bx,1
@@ -349,8 +349,8 @@ _vspan4brush	PROC NEAR
         mov     ax,0205h
         out     dx,ax
 	mov	cx,WORD PTR [bp+4]	;x
-        mov     bx,cx
-        and     bx,7
+        mov     bx,0007h
+        and     bx,cx
         shl     bx,1
         mov     ax,WORD PTR _pixmask[bx]
         out     dx,ax
@@ -368,13 +368,13 @@ _vspan4brush	PROC NEAR
         shr     ax,1
         shr     ax,1
 	add	di,ax                   ;x>>3
-        mov     si,cx                   ;x
-        and     si,3
+        mov     si,0003h
+        and     si,cx                   ;x
         add     si,OFFSET _packbrush4
         mov     cx,WORD PTR [bp+8]      ;yb
         sub     cx,bx                   ;yt
         inc     cx
-        and     bl,3
+        and     bl,03h
         shl     bl,1
         shl     bl,1
 vloop:  mov     al,BYTE PTR [si][bx]
@@ -406,8 +406,8 @@ _pixel4brush	PROC NEAR
         mov     ax,0205h
         out     dx,ax
 	mov	cx,WORD PTR [bp+4]	;x
-        mov     bx,cx
-        and     bx,7
+        mov     bx,0007h
+        and     bx,cx
         shl     bx,1
         mov     ax,WORD PTR _pixmask[bx]
         out     dx,ax
@@ -425,10 +425,10 @@ _pixel4brush	PROC NEAR
         shr     dx,1
         shr     dx,1
 	add	di,dx                   ;x
-        and     bl,3
+        and     bl,03h
         shl     bx,1
         shl     bx,1
-        and     cl,3
+        and     cl,03h
         add     bl,cl
         mov     al,BYTE PTR _packbrush4[bx]
 	mov	ah,BYTE PTR es:[di]     ;latches
@@ -466,11 +466,11 @@ _hspan4	        PROC NEAR
         mov     bx,WORD PTR [bp+6]      ;xr
         xor     dx,dx
         not     dx
-        and     cl,7                    ;xl
+        and     cl,07h                  ;xl
         shr     dl,cl                   ;lmask
         mov     cl,bl                   ;xr
         not     cl
-        and     cl,7
+        and     cl,07h
         shl     dh,cl                   ;rmask
         shr     bx,1
         shr     bx,1
@@ -554,8 +554,8 @@ _vspan4	        PROC NEAR
         mov     ax,0205h
         out     dx,ax
 	mov	cx,WORD PTR [bp+4]	;x
-        mov     bx,cx
-        and     bx,7
+        mov     bx,0007h
+        and     bx,cx
         shl     bx,1
         mov     ax,WORD PTR _pixmask[bx] ;pixmask
         out     dx,ax
@@ -601,8 +601,8 @@ _pixel4	        PROC NEAR
         mov     ax,0205h
         out     dx,ax
 	mov	cx,WORD PTR [bp+4]	;x
-        mov     bx,cx
-        and     bx,7
+        mov     bx,0007h
+        and     bx,cx
         shl     bx,1
         mov     ax,WORD PTR _pixmask[bx]
         out     dx,ax
@@ -643,17 +643,17 @@ _pixel4alpha	PROC NEAR
         mov     ax,0205h
         out     dx,ax
 	mov	cx,WORD PTR [bp+4]	;x
-        mov     bx,cx
+        mov     bx,0007h
+        and     bx,cx
         shr     cx,1
         shr     cx,1
         shr     cx,1
 	add	di,cx                   ;x
-        and     bx,7
         shl     bx,1
         mov     ax,WORD PTR _pixmask[bx]
         out     dx,ax
-        mov     bx,WORD PTR [bp+8]      ;alpha
-        and     bx,00C0h
+        mov     bx,00C0h
+        and     bx,WORD PTR [bp+8]      ;alpha
         jz      aaexit
         mov     cx,WORD PTR [bp+6]      ;y
         mov     ax,cx                   ;y

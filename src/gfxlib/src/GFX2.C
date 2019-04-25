@@ -2,9 +2,13 @@
 #include <bios.h>
 #include "gfx.h"
 
+#define SHADOW_PAGE     1
+#define SHADOW_DIRTY    2
+
 extern int render_page;
 extern unsigned char far *page_addr[2];
 extern unsigned char far *renderbuff;
+unsigned char shadow, far *page_shadow[2];
 unsigned char idx2, rgb2[3];
 unsigned int scanaddr[200];
 unsigned long brush2;
@@ -101,8 +105,9 @@ unsigned char amul2[4][4] =
 	{0x00, 0x55, 0xAA, 0xFF}
 };
 
-void clear2(void);
 void flip2(int sync);
+void clear2(void);
+void copypage2(unsigned char far *src, unsigned char far *dst);
 void render2(int page);
 void mono2rgb(int red, int grn, int blu);
 void color2rgb(int red, int grn, int blu);
@@ -129,19 +134,29 @@ int gfxmode2(int modeflags)
     if (regs.h.al != 0x04)
         return 0;
     /*
+     * Load ROM 8x8 character set.
+     */
+    regs.x.ax = 0x1123;
+    int86(0x10, &regs, &regs);
+    /*
      * Fill in scanline/framebuffer addresses
      */
     for (scan = 0; scan < 200; scan++)
         scanaddr[scan] = (scan >> 1) * 80 + (scan & 1) * 8192;
-    renderbuff   = (unsigned char far *)0xB8000000L;
-    page_addr[0] = renderbuff;
     /*
-     * Allocate back buffer.
+     * Allocate shadow buffers.
      */
     regs.x.ax = 0x4800; // Allocate bx paragraphs
-    regs.x.bx = 0x0400; // 16K (1024 paragraphs)
+    regs.x.bx = 0x0800; // 32K (2048 paragraphs)
     int86(0x21, &regs, &regs);
-    page_addr[1] = (unsigned char far *)((unsigned long)regs.x.ax << 16);
+    page_shadow[0] = (unsigned char far *)((unsigned long)regs.x.ax << 16);
+    page_shadow[1] = (unsigned char far *)((unsigned long)regs.x.ax << 16) + 0x4000;
+    page_addr[1]   = page_shadow[0];
+    shadow         = SHADOW_DIRTY;
+    renderbuff     = page_shadow[0]; clear2();
+    renderbuff     = page_shadow[1]; clear2();
+    renderbuff     = (unsigned char far *)0xB8000000L;
+    page_addr[0]   = renderbuff;
     if (*(unsigned int far *)0xC0000000L == 0xAA55) // On EGA/VGA or CGA?
     {
         /*
@@ -199,8 +214,27 @@ void render2(int page)
 {
     union REGS regs;
 
+    if (render_page == FRONT_PAGE)
+        shadow |= SHADOW_DIRTY;
     render_page = page & 1;
     renderbuff  = page_addr[render_page];
+}
+/*
+ * Flip display/render pages.
+ */
+void flip2(int sync)
+{
+    if (shadow & SHADOW_DIRTY)
+    {
+        shadow &= ~SHADOW_DIRTY;
+        copypage2((unsigned char far *)0xB8000000L, page_shadow[shadow ^ SHADOW_PAGE]);
+    }
+    copypage2(page_shadow[shadow], (unsigned char far *)0xB8000000L);
+    shadow      ^= SHADOW_PAGE;
+    if (render_page == FRONT_PAGE)
+        shadow |= SHADOW_DIRTY;
+    page_addr[1] = page_shadow[shadow];
+    renderbuff   = page_addr[render_page];
 }
 /*
  * Build a dithered brush.

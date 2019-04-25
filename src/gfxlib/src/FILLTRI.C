@@ -4,6 +4,24 @@
 #include <dos.h>
 #include "gfx.h"
 
+unsigned char bitmap[] =
+{
+    0x7F, 0xFF, 0xFE,
+    0xFF, 0xFF, 0xFF,
+    0x80, 0x00, 0x01,
+    0x80, 0x00, 0x01,
+    0x80, 0x3C, 0x01,
+    0x80, 0x3C, 0x01,
+    0x80, 0xC3, 0x01,
+    0x80, 0xC3, 0x01,
+    0x80, 0x3C, 0x01,
+    0x80, 0x3C, 0x01,
+    0x80, 0x00, 0x01,
+    0x80, 0x00, 0x01,
+    0xFF, 0xFF, 0xFF,
+    0x7F, 0xFF, 0xFE
+};
+
 unsigned long gettime(void)
 {
     struct dostime_t time;
@@ -11,9 +29,11 @@ unsigned long gettime(void)
     _dos_gettime(&time);
     return time.hour * 360000UL + time.minute * 6000UL + time.second * 100UL + time.hsecond;
 }
+
 int main(int argc, char **argv)
 {
     int mode, c, f, b;
+    unsigned char h;
     int xv[3], yv[3], ix[3], iy[3];
     int rgb[3], irgb[3];
     f = 1;
@@ -55,6 +75,7 @@ int main(int argc, char **argv)
         rgb[c]  = rand() % 256;
         irgb[c] = ((rand() % 5) - 3) | 1;
     }
+    h = 0;
     while (!kbhit())
     {
         if (b)
@@ -75,6 +96,9 @@ int main(int argc, char **argv)
         aaline(xv[0], yv[0], xv[1], yv[1]);
         aaline(xv[1], yv[1], xv[2], yv[2]);
         aaline(xv[2], yv[2], xv[0], yv[0]);
+        color(h, 0, h); h += 16;
+        text(148, 72, "GFXLib!");
+        //bitblt(148, 72, 24, 14, 0, 0, bitmap, 3);
         for (c = 0; c < 3; c++)
         {
             xv[c] += ix[c];

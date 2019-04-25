@@ -14,7 +14,6 @@ _BSS	ENDS
 DGROUP	GROUP	CONST, _BSS, _DATA
 	ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
 
-EXTRN   _page_addr:NEAR
 EXTRN   _renderbuff:NEAR
 EXTRN   _scanaddr:NEAR
 EXTRN   _brush2:NEAR
@@ -36,17 +35,18 @@ _clear2         PROC NEAR
         ret
 _clear2         ENDP
 
-        PUBLIC	_flip2
-;void flip2(int sync)
-_flip2          PROC NEAR
+        PUBLIC	_copypage2
+;void copypage2(unsigned char far *src, unsigned char far *dst)
+_copypage2      PROC NEAR
         push    bp
         mov     bp,sp
-;	sync = 4
+;	src = 4
+;       dst = 8
         push    di
         push    si
         push    ds
-        les     di,DWORD PTR _page_addr   ;video front page
-        lds     si,DWORD PTR _page_addr+4 ;video back  page
+        les     di,DWORD PTR (bp+8)     ;destination page
+        lds     si,DWORD PTR (bp+4)     ;source page
         mov     cx,02000h
         rep     movsw
         pop     ds
@@ -54,7 +54,7 @@ _flip2          PROC NEAR
         pop     di
         pop     bp
         ret
-_flip2          ENDP
+_copypage2          ENDP
 
         PUBLIC	_hspan2brush
 ;void hspan2brush(int xl, int xr, int y)
@@ -68,21 +68,21 @@ _hspan2brush	PROC NEAR
         push    si
         les     di,DWORD PTR _renderbuff ;video render page
         mov     bx,WORD PTR [bp+8]      ;y
-        mov     si,bx
-        and     si,3
+        mov     si,0003h
+        and     si,bx
         shl     bx,1
         add     di,WORD PTR _scanaddr[bx] ;vbuf
         mov     bx,WORD PTR [bp+4]      ;xl
         xor     dx,dx
         not     dx
-        mov     cl,bl                   ;xl
-        and     cl,3
+        mov     cl,03h
+        and     cl,bl                   ;xl
         shl     cl,1
         shr     dl,cl                   ;lmask
         mov     ax,WORD PTR [bp+6]      ;xr
         mov     cl,al                   ;xr
         not     cl
-        and     cl,3
+        and     cl,03h
         shl     cl,1
         shl     dh,cl                   ;rmask
         shr     bx,1                    ;xl
@@ -166,8 +166,8 @@ _vspan2brush	PROC NEAR
         les     di,DWORD PTR _renderbuff ;video render page
         mov     ax,WORD PTR [bp+4]      ;x
         mov     ch,0C0h
-        mov     cl,al                   ;x
-        and     cl,3
+        mov     cl,03h
+        and     cl,al                   ;x
         shl     cl,1
         shr     ch,cl                   ;mask
         shr     ax,1                    ;xl
@@ -178,8 +178,8 @@ _vspan2brush	PROC NEAR
         sub     ax,si
         mov     cl,al
         inc     cl
-vbloop: mov     bx,si
-        and     bx,0003h
+vbloop: mov     bx,0003h
+        and     bx,si
         mov     ah,ch
         and     ah,BYTE PTR _brush2[bx] ;pattern
         shl     si,1
@@ -212,11 +212,11 @@ _pixel2brush	PROC NEAR
         shl     bx,1
         add     di,WORD PTR _scanaddr[bx] ;vbuf
         shr     bx,1
-        and     bx,3
+        and     bx,0003h
         mov     ax,WORD PTR [bp+4]      ;x
         mov     dl,0C0h
-        mov     cl,al                   ;x
-        and     cl,3
+        mov     cl,03h
+        and     cl,al                   ;x
         shl     cl,1
         shr     dl,cl                   ;mask
         shr     ax,1                    ;xl
@@ -249,14 +249,14 @@ _hspan2	        PROC NEAR
         mov     bx,WORD PTR [bp+4]      ;xl
         xor     dx,dx
         not     dx
-        mov     cl,bl                   ;xl
-        and     cl,3
+        mov     cl,03h
+        and     cl,bl                   ;xl
         shl     cl,1
         shr     dl,cl                   ;lmask
         mov     ax,WORD PTR [bp+6]      ;xr
         mov     cl,al                   ;xr
         not     cl
-        and     cl,3
+        and     cl,03h
         shl     cl,1
         shl     dh,cl                   ;rmask
         shr     bx,1                    ;xl
@@ -337,8 +337,8 @@ _vspan2	        PROC NEAR
         les     di,DWORD PTR _renderbuff ;video render page
         mov     ax,WORD PTR [bp+4]      ;x
         mov     ch,0C0h
-        mov     cl,al                   ;x
-        and     cl,3
+        mov     cl,03h
+        and     cl,al                   ;x
         shl     cl,1
         shr     ch,cl                   ;mask
         shr     ax,1                    ;xl
@@ -382,8 +382,8 @@ _pixel2	        PROC NEAR
         add     di,WORD PTR _scanaddr[bx] ;vbuf
         mov     bx,WORD PTR [bp+4]      ;x
         mov     dl,0C0h
-        mov     cl,bl                   ;x
-        and     cl,3
+        mov     cl,03h
+        and     cl,bl                   ;x
         shl     cl,1
         shr     dl,cl                   ;mask
         shr     bx,1                    ;xl
@@ -417,8 +417,8 @@ _pixel2alpha	PROC NEAR
         mov     bx,ax
         mov     ax,WORD PTR [bp+4]      ;x
         mov     dl,0C0h
-        mov     cl,al                   ;x
-        and     cl,3
+        mov     cl,03h
+        and     cl,al                   ;x
         shl     cl,1
         shr     dl,cl                   ;mask
         shr     ax,1                    ;xl
@@ -427,7 +427,7 @@ _pixel2alpha	PROC NEAR
         mov     al,BYTE PTR _idx2       ;pattern
         xor     cl,6
         shr     al,cl
-        and     al,3
+        and     al,03h
         mov     cl,4
         shr     bl,cl
         or      bl,al

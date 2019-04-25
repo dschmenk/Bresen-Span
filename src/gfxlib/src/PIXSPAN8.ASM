@@ -69,8 +69,8 @@ _hspan8brush	PROC NEAR
         mov     al,BYTE PTR es:[bx+80*200] ;latch brush
         mov     dx,0F0Fh
 	mov	ax,WORD PTR [bp+4]	;xl
-        mov     cl,al
-        and     cl,03h
+        mov     cl,03h
+        and     cl,al
         shl     dl,cl                   ;lmask
         shr     ax,1
         shr     ax,1
@@ -145,8 +145,8 @@ _hspan8	        PROC NEAR
         add     di,ax
         mov     dx,0F0Fh
 	mov	ax,WORD PTR [bp+4]	;xl
-        mov     cl,al
-        and     cl,03h
+        mov     cl,03h
+        and     cl,al
         shl     dl,cl                   ;lmask
         shr     ax,1
         shr     ax,1
@@ -222,8 +222,8 @@ _vspan8brush	PROC NEAR
         shl     ax,cl                   ;y*64+y*16=y*80
         add     di,ax                   ;pix
 	mov	ax,WORD PTR [bp+4]	;x
-        mov	cl,al
-        and     cx,0003h
+        mov     cx,0003h
+        and	cl,al
         shr     ax,1
         shr     ax,1
 	add	di,ax                   ;+x
@@ -291,8 +291,8 @@ _vspan8	        PROC NEAR
 ;	yb = 8
         les     bx,DWORD PTR _renderbuff ;video render page
 	mov	ax,WORD PTR [bp+4]	;x
-        mov     cl,al
-        and     cl,03h
+        mov     cl,03h
+        and     cl,al
         shr     ax,1
         shr     ax,1
 	add	bx,ax                   ;+x
@@ -336,8 +336,8 @@ _pixel8brush    PROC NEAR
         shl     ax,cl                   ;y*64+y*16=y*80
         add     di,ax
 	mov	ax,WORD PTR [bp+4]	;x
-        mov     cl,al
-        and     cl,03h
+        mov     cl,03h
+        and     cl,al
         shr     ax,1
         shr     ax,1
 	add	di,ax                   ;+x
@@ -363,8 +363,8 @@ _pixel8	        PROC NEAR
 ;	y = 6
         les     bx,DWORD PTR _renderbuff ;video render page
 	mov	ax,WORD PTR [bp+4]	;x
-        mov     cl,al
-        and     cl,03h
+        mov     cl,03h
+        and     cl,al
         shr     ax,1
         shr     ax,1
 	add	bx,ax                   ;+x
@@ -405,8 +405,8 @@ _pixel8argb	PROC NEAR
         shl     ax,cl                   ;y*64+y*16=y*80
         add     di,ax
 	mov	ax,WORD PTR [bp+4]	;x
-        mov     cl,al
-        and     cl,03h
+        mov     cl,03h
+        and     cl,al
         shr     ax,1
         shr     ax,1
 	add	di,ax                   ;+x
@@ -433,19 +433,19 @@ acmix:  and     si,00E0h
 	mov	bl,BYTE PTR _rgb8+2     ;red
         shr     bl,cl
 	mov     al,BYTE PTR _amulr[bx][si]
-        mov     bl,dl
-        and     bl,07h
+        mov     bl,07h
+        and     bl,dl
         xor     si,0038h
         add     al,BYTE PTR _amulr[bx][si]
 	mov	bl,BYTE PTR _rgb8+1     ;grn
         shr     bl,cl
         xor     si,0038h
 	or	al,BYTE PTR _amulg[bx][si]
-        mov     bl,dl
+        mov     bl,38h
+        and     bl,dl
         shr     bl,1
         shr     bl,1
         shr     bl,1
-        and     bl,07h
         xor     si,0038h
         add     al,BYTE PTR _amulg[bx][si]
 	mov	bl,BYTE PTR _rgb8+0     ;blu
@@ -482,9 +482,9 @@ _pixel8amono	PROC NEAR
         mov     cl,4
         shl     ax,cl                   ;y*64+y*16=y*80
 	add	di,ax                   ;+x
-	mov	cx,WORD PTR [bp+4]	;x
-        mov     ax,cx
-        and     cl,03h
+	mov	ax,WORD PTR [bp+4]	;x
+        mov     cl,03h
+        and     cl,al
         shr     ax,1
         shr     ax,1
         add     di,ax
