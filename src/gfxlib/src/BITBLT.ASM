@@ -77,8 +77,15 @@ yloop:	mov	ax,WORD PTR [bp+16]	;src
 	mov	si,WORD PTR [bp+4]	;xl
 	mov	di,WORD PTR [bp+8]	;width
 	les	bx,DWORD PTR [bp-10]	;srcspan
-        mov	al,BYTE PTR [bp-2]	;srcmask
-	mov     ah,BYTE PTR es:[bx]
+chksrc: mov     ah,BYTE PTR es:[bx]
+        or      ah,ah
+        jnz     bitscan
+        inc     bx
+        add     si,8
+        sub     di,8
+        jg      chksrc
+        jmp     ynext
+bitscan: mov	al,BYTE PTR [bp-2]	;srcmask
 	test    al,ah
 	jnz	fill
 trans:	dec     di
