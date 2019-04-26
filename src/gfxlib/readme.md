@@ -23,6 +23,7 @@ Sample programs: These programs just demonstrate the abilities of the library. T
 TRIFILL.EXE has additional flags to control filling and double buffering.
 
     -f0 : disable fill mode
+    -a0 : disable anti-aliased outline
     -b  : buffer the rendering to back page and flip on VSYNC to display
     
 SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.

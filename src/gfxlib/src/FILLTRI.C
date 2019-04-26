@@ -32,17 +32,20 @@ unsigned long gettime(void)
 
 int main(int argc, char **argv)
 {
-    int mode, c, f, b;
+    int mode, c, f, b, aa;
     unsigned char h;
     int xv[3], yv[3], ix[3], iy[3];
     int rgb[3], irgb[3];
-    f = 1;
-    b = 0;
+    f  = 1;
+    aa = 0;
+    b  = 0;
     mode = MODE_BEST;
     while (argc > 1 && argv[1][0] == '-')
     {
         if (argv[1][1] == 'f')
             f = argv[1][2] - '0';
+        else if (argv[1][1] == 'a')
+            aa = argv[1][2] - '0';
         else if (argv[1][1] == 'b')
             b = 1;
         else if (argv[1][1] == 'd')
@@ -93,9 +96,18 @@ int main(int argc, char **argv)
             endfill();
             color(255, 255, 255);
         }
-        aaline(xv[0], yv[0], xv[1], yv[1]);
-        aaline(xv[1], yv[1], xv[2], yv[2]);
-        aaline(xv[2], yv[2], xv[0], yv[0]);
+        if (aa)
+        {
+            aaline(xv[0], yv[0], xv[1], yv[1]);
+            aaline(xv[1], yv[1], xv[2], yv[2]);
+            aaline(xv[2], yv[2], xv[0], yv[0]);
+        }
+        else
+        {
+            line(xv[0], yv[0], xv[1], yv[1]);
+            line(xv[1], yv[1], xv[2], yv[2]);
+            line(xv[2], yv[2], xv[0], yv[0]);
+        }
         color(h, 0, h); h += 16;
         text(148, 72, "GFXLib!");
         //bitblt(148, 72, 24, 14, 0, 0, bitmap, 3);
