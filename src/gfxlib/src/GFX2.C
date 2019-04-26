@@ -248,8 +248,8 @@ static void mono2rgb(int red, int grn, int blu)
     rgb2[BLU] = blu;
     i         = ((red >> 2) + (grn >> 1) + (blu >> 2)) >> 2;
     brush2    = monodither2[i];
-    i         = (red >> 1) | (grn) | (blu >> 1);
-    idx2      = (i & 0xC0) | ((i >> 2) & 0x30) | ((i >> 4) & 0x0C) | ((i >> 6) & 0x03);
+    i        += 0x07; if (i > 0x3F) i = 0x3F;
+    idx2      = ((i << 2) & 0xC0) | (i & 0x30) | ((i >> 2) & 0x0C) | ((i >> 4) & 0x03);
 }
 static void color2rgb(int red, int grn, int blu)
 {
@@ -260,7 +260,7 @@ static void color2rgb(int red, int grn, int blu)
     rgb2[BLU] = blu;
     i         = ((red >> 2) + (grn >> 1) + (blu >> 2)) >> 4;
     brush2    = colordither2[i];
-    i         = (red >> 1) | (grn) | (blu >> 1);
-    idx2      = (i & 0xC0) | ((i >> 2) & 0x30) | ((i >> 4) & 0x0C) | ((i >> 6) & 0x03);
+    i        += 0x01; if (i > 0x0F) i = 0x0F;
+    idx2      = ((i << 4) & 0xC0) | ((i << 2) & 0x30) | (i & 0x0C) | ((i >> 2) & 0x03);
 }
 
