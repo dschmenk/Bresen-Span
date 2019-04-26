@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     int xv[3], yv[3], ix[3], iy[3];
     int rgb[3], irgb[3];
     f  = 1;
-    aa = 0;
+    aa = 1;
     b  = 0;
     mode = MODE_BEST;
     while (argc > 1 && argv[1][0] == '-')
@@ -154,4 +154,3 @@ int main(int argc, char **argv)
     restoremode();
     return 0;
 }
-
