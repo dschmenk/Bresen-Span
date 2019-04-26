@@ -109,11 +109,6 @@ void pixel8rgb(int x, int y, int red, int grn, int blu);
 void pixel8argb(int x, int y, int alpha);
 void pixel8amono(int x, int y, int alpha);
 
-static void outCRTC(unsigned int * regs)
-{
-    while (*regs)
-        outpw(VGA_CRTC, *regs++);
-}
 int gfxmode8(int modeflags)
 {
     union  REGS  regs;
