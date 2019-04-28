@@ -23,7 +23,9 @@ Sample programs: These programs just demonstrate the abilities of the library. T
 TRIFILL.EXE has additional flags to control filling and double buffering.
 
     -f0 : disable fill mode
+    -f1 : enable fill mode (default)
     -a0 : disable anti-aliased outline
+    -a1 : enable anti-aliased outline (default)
     -b  : buffer the rendering to back page and flip on VSYNC to display
     
 SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
@@ -31,6 +33,10 @@ SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple 
 SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and also has these additional flags:
 
     -f0 : disable fill mode
-    -a0 : disable anti-aliased outline
+    -f1 : enable fill mode (default)
+    -a0 : disable anti-aliased outline (default)
+    -a1 : enable anti-aliased outline
+    -h0 : disable hidden line
+    -h1 : enable hidden lines (default)
 
 ![NCC1701](https://github.com/dschmenk/Bresen-Span/blob/master/images/NCC1701.png)

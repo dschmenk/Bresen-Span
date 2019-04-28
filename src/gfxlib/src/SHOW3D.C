@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include "gfx.h"
 
-int fill, aa;
+int fill, aa, hidden;
 void (*outline)(int x1, int y1, int x2, int y2);
 /*
  * Viewing angle and position
@@ -52,7 +52,7 @@ unsigned NumSorted;
 
 #define BLACK           0
 
-#define	DIST            300.0
+#define	DIST            150.0
 #define MAX_DIST        600.0
 #define MIN_DIST        0.0
 
@@ -191,8 +191,8 @@ void InitRender(char * ObjFile)
             fprintf(stderr, "Couldn't malloc polygon array\n");
             exit(1);
         }
-        SortedPoly = (polygon **)malloc(sizeof(polygon *) * NumPolys);
-        SortedDepth = malloc(sizeof(float) * NumPolys);
+        SortedPoly = (polygon **)malloc(sizeof(polygon *) * (NumPolys+1));
+        SortedDepth = malloc(sizeof(float) * (NumPolys+1));
         /*
          * Read in the verteces
          */
@@ -281,7 +281,7 @@ void WorldToScreen(void)
 
 void UpdateRender(void)
 {
-    int   np, i, j, p, SkipPoly;
+    int   np, i, j, p, c, SkipPoly;
     float x1, y1, x2, y2, zMin;
 
     /*
@@ -293,54 +293,54 @@ void UpdateRender(void)
      */
     color(0, 0, 0);
     clear();
-    if (fill)
+    NumSorted = 0;
+    for (np = 0; np < NumPolys; np++)
     {
-        NumSorted = 0;
-        for (np = 0; np < NumPolys; np++)
+        SkipPoly = 0;
+        zMin     = MAX_DIST;
+        for (j = 0; j < Polygon[np].Count; j++)
         {
-            SkipPoly = 0;
-            zMin     = MAX_DIST;
-            for (j = 0; j < Polygon[np].Count; j++)
+            if (Vertex[Polygon[np].Index[j]].zScreen < 0.0)
             {
-                if (Vertex[Polygon[np].Index[j]].zScreen < 0.0)
-                {
-                    SkipPoly = 1;
-                    break;
-                }
-                if (Vertex[Polygon[np].Index[j]].zScreen < zMin)
-                    zMin = Vertex[Polygon[np].Index[j]].zScreen;
+                SkipPoly = 1;
+                break;
             }
-            if (!SkipPoly)
-            {
-                /*
-                 * Insert polygon into sorted list
-                 */
-                j = (NumSorted + 1) / 2;
-                p = j / 2;
-                while (p)
-                {
-                    if (zMin < SortedDepth[j])
-                        j -= p;
-                    else
-                        j += p;
-                    p /= 2;
-                }
-                for (i = NumSorted; i > j; i--)
-                {
-                    SortedPoly[i]  = SortedPoly[i-1];
-                    SortedDepth[i] = SortedDepth[i-1];
-                }
-                SortedPoly[j]  = &Polygon[np];
-                SortedDepth[j] = zMin;
-                NumSorted++;
-            }
+            if (Vertex[Polygon[np].Index[j]].zScreen < zMin)
+                zMin = Vertex[Polygon[np].Index[j]].zScreen;
         }
-        for (np = NumSorted - 1; np >= 0; np--)
+        if (!SkipPoly)
         {
-            i = DIST*1.7 - SortedDepth[np] * 1.8;
-            if (i > 255) i = 255;
-            if (i < 0)   i = 0;
-            color(i, i, i);
+            /*
+             * Insert polygon into sorted list
+             */
+            j = (NumSorted + 1) / 2;
+            p = j / 2;
+            while (p)
+            {
+                if (zMin < SortedDepth[j])
+                    j -= p;
+                else
+                    j += p;
+                p /= 2;
+            }
+            for (i = NumSorted; i > j; i--)
+            {
+                SortedPoly[i]  = SortedPoly[i-1];
+                SortedDepth[i] = SortedDepth[i-1];
+            }
+            SortedPoly[j]  = &Polygon[np];
+            SortedDepth[j] = zMin;
+            NumSorted++;
+        }
+    }
+    for (np = NumSorted - 1; np >= 0; np--)
+    {
+        c = DIST * 3.0 - SortedDepth[np] * 1.4;
+        if (c > 255) c = 255;
+        if (c < 0)   c = 0;
+        if (fill)
+        {
+            hidden ? color(0, 0, 0) : color(c, c, c);
             beginfill();
             p = SortedPoly[np]->Index[SortedPoly[np]->Count - 1];
             for (j = 0; j < SortedPoly[np]->Count; j++)
@@ -351,36 +351,15 @@ void UpdateRender(void)
             }
             endfill();
         }
-    }
-    else
-    {
-        /*
-         * Line draw
-         */
-        for (np = 0; np < NumPolys; np++)
+        if (!fill || hidden)
         {
-            SkipPoly = 0;
-            for (j = 0; j < Polygon[np].Count; j++)
+            color(c, c, c);
+            p = SortedPoly[np]->Index[SortedPoly[np]->Count - 1];
+            for (j = 0; j < SortedPoly[np]->Count; j++)
             {
-                if (Vertex[Polygon[np].Index[j]].zScreen < 0.0)
-                {
-                    SkipPoly = 1;
-                    break;
-                }
-            }
-            if (!SkipPoly)
-            {
-                i = DIST*1.7 - Vertex[Polygon[np].Index[0]].zScreen * 1.8;
-                if (i > 255) i = 255;
-                if (i < 0)   i = 0;
-                color(i, i, i);
-                p = Polygon[np].Index[Polygon[np].Count - 1];
-                for (j = 0; j < Polygon[np].Count; j++)
-                {
-                    i = Polygon[np].Index[j];
-                    outline(Vertex[p].xScreen, Vertex[p].yScreen, Vertex[i].xScreen, Vertex[i].yScreen);
-                    p = i;
-                }
+                i = SortedPoly[np]->Index[j];
+                outline(Vertex[p].xScreen, Vertex[p].yScreen, Vertex[i].xScreen, Vertex[i].yScreen);
+                p = i;
             }
         }
     }
@@ -394,15 +373,18 @@ int main(int argc, char *argv[])
 {
     int mode;
 
-    fill = 1;
-    aa   = 1;
-    mode = MODE_BEST;
+    fill   = 1;
+    aa     = 0;
+    hidden = 1;
+    mode   = MODE_BEST;
     while (argc > 1 && argv[1][0] == '-')
     {
         if (argv[1][1] == 'f')
             fill = argv[1][2] - '0';
         else if (argv[1][1] == 'a')
             aa = argv[1][2] - '0';
+        else if (argv[1][1] == 'h')
+            hidden = argv[1][2] - '0';
         else if (argv[1][1] == 'd')
             switch (argv[1][2] - '0')
             {
@@ -441,3 +423,4 @@ int main(int argc, char *argv[])
 }
 
 
+
