@@ -33,4 +33,4 @@ SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and als
     -f0 : disable fill mode
     -a0 : disable anti-aliased outline
 
-![NCC1701)[https://github.com/dschmenk/Bresen-Span/blob/master/images/NCC1701.png]
+![NCC1701](https://github.com/dschmenk/Bresen-Span/blob/master/images/NCC1701.png]
