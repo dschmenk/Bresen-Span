@@ -27,3 +27,8 @@ TRIFILL.EXE has additional flags to control filling and double buffering.
     -b  : buffer the rendering to back page and flip on VSYNC to display
     
 SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
+
+SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and also has these additional flags:
+
+    -f0 : disable fill mode
+    -a0 : disable anti-aliased outline
