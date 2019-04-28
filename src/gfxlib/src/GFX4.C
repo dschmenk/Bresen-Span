@@ -102,7 +102,7 @@ unsigned char amul4[4][16] =
 };
 
 void clear4(void);
-void flip4(int sync);
+void flip4(void);
 void mono4rgb(int red, int grn, int blu);
 void color4rgb(int red, int grn, int blu);
 void pixel4brush(int x, int y);
@@ -193,7 +193,7 @@ int gfxmode4(int modeflags)
 /*
  * Flip display page.
  */
-static void flip4(int sync)
+static void flip4(void)
 {
     unsigned int displaybuff;
 
@@ -201,14 +201,9 @@ static void flip4(int sync)
     render_page  ^= 1;
     renderbuff    =               page_addr[render_page];
     displaybuff   = (unsigned int)page_addr[display_page];
-    if (sync)
-    {
-        while(  inp(VGA_STATUS) & 0x08);  // Wait for current retrace
-        outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
-        while(!(inp(VGA_STATUS) & 0x08)); // Wait for next retrace
-    }
-    else
-        outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
+    while(  inp(VGA_STATUS) & 0x08);  // Wait for current retrace
+    outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
+    while(!(inp(VGA_STATUS) & 0x08)); // Wait for next retrace
 }
 /*
  * Build a dithered brush.

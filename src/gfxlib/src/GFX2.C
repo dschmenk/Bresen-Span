@@ -105,7 +105,7 @@ unsigned char amul2[4][4] =
     {0x00, 0x55, 0xAA, 0xFF}
 };
 
-void flip2(int sync);
+void flip2(void);
 void clear2(void);
 void copypage2(unsigned char far *src, unsigned char far *dst);
 void render2(int page);
@@ -133,11 +133,6 @@ int gfxmode2(int modeflags)
     int86(0x10, &regs, &regs);
     if (regs.h.al != 0x04)
         return 0;
-    /*
-     * Load ROM 8x8 character set.
-     */
-    regs.x.ax = 0x1123;
-    int86(0x10, &regs, &regs);
     /*
      * Fill in scanline/framebuffer addresses
      */
@@ -222,7 +217,7 @@ void render2(int page)
 /*
  * Flip display/render pages.
  */
-void flip2(int sync)
+void flip2(void)
 {
     if (shadow & SHADOW_DIRTY)
     {
@@ -263,4 +258,5 @@ static void color2rgb(int red, int grn, int blu)
     i        += 0x01; if (i > 0x0F) i = 0x0F;
     idx2      = ((i << 4) & 0xC0) | ((i << 2) & 0x30) | (i & 0x0C) | ((i >> 2) & 0x03);
 }
+
 

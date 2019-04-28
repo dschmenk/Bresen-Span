@@ -12,7 +12,7 @@ static int minscan = 0;
 void (*fillhspan)(int xl, int xr, int y);
 void (*fillvspan)(int x, int yt, int yb);
 void (*clear)(void);
-void (*flip)(int sync);
+void (*flip)(void);
 void (*render)(int page);
 void (*color)(int red, int grn, int blu);
 void (*hspan)(int xl, int xr, int y);

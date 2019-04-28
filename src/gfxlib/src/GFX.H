@@ -12,17 +12,16 @@
 #define MODE_MONO       1
 #define FRONT_PAGE      0
 #define BACK_PAGE       1
-#define NO_VSYNC        0
-#define VSYNC           1
 int gfxmode(int modeflags);
 void restoremode(void);
 void line(int x1, int y1, int x2, int y2);
+void aaline(int x1, int y1, int x2, int y2);
 void bitblt(int xl, int yt, int width, int height, int xoffset, int yoffset, unsigned char far *src, int pitch);
 void beginfill(void);
 void endfill(void);
 void text(int x, int y, char *string);
 extern void (*clear)(void);
-extern void (*flip)(int sync);
+extern void (*flip)(void);
 extern void (*render)(int page);
 extern void (*color)(int red, int grn, int blu);
 extern void (*hspan)(int xl, int xr, int y);

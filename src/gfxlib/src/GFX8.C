@@ -95,7 +95,7 @@ unsigned char amulb[8][4] = // Above table shifted left by 2
 	{0x00, 0x40, 0x80, 0xC0}
 };
 
-void flip8(int sync);
+void flip8(void);
 void clear8(void);
 void mono8rgb(int red, int grn, int blu);
 void color8rgb(int red, int grn, int blu);
@@ -231,7 +231,7 @@ int gfxmode8(int modeflags)
 /*
  * Flip display page.
  */
-static void flip8(int sync)
+static void flip8(void)
 {
     unsigned int displaybuff;
 
@@ -239,14 +239,9 @@ static void flip8(int sync)
     render_page  ^= 1;
     renderbuff    =               page_addr[render_page];
     displaybuff   = (unsigned int)page_addr[display_page];
-    if (sync)
-    {
-        while(  inp(VGA_STATUS) & 0x08);  // Wait for current retrace
-        outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
-        while(!(inp(VGA_STATUS) & 0x08)); // Wait for next retrace
-    }
-    else
-        outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
+    while(  inp(VGA_STATUS) & 0x08);  // Wait for current retrace
+    outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
+    while(!(inp(VGA_STATUS) & 0x08)); // Wait for next retrace
 }
 static void mono8rgb(int red, int grn, int blu)
 {
