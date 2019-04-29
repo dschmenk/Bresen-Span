@@ -294,6 +294,7 @@ void UpdateRender(void)
     color(0, 0, 0);
     clear();
     NumSorted = 0;
+    SortedDepth[0] = 0.0;
     for (np = 0; np < NumPolys; np++)
     {
         SkipPoly = 0;
@@ -313,7 +314,7 @@ void UpdateRender(void)
             /*
              * Insert polygon into sorted list
              */
-            j = (NumSorted + 1) / 2;
+            j = NumSorted / 2;
             p = j / 2;
             while (p)
             {
@@ -323,6 +324,8 @@ void UpdateRender(void)
                     j += p;
                 p /= 2;
             }
+            while (j < NumSorted && zMin > SortedDepth[j]) j++;
+            while (j && zMin < SortedDepth[j-1]) j--;
             for (i = NumSorted; i > j; i--)
             {
                 SortedPoly[i]  = SortedPoly[i-1];
