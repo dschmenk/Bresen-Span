@@ -20,6 +20,9 @@ Sample programs: These programs just demonstrate the abilities of the library. T
     -d4 : use 4 BPP mode
     -d8 : use 8 BPP mode (default)
     
+LINETEST.EXE:
+![AALine](https://github.com/dschmenk/Bresen-Span/blob/master/images/aaline.png)
+
 TRIFILL.EXE has additional flags to control filling and double buffering.
 
     -f0 : disable fill mode

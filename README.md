@@ -200,10 +200,6 @@ void aaline(int x1, int y1, int x2, int y2)
     ...
 }
 ```
-
-You will find the complete routines and some sample routines in the form of an 8BPP framebuffer library in the source directory. Real-mode DOS binaries (VGA required) can be run inside DOSBox to see it in action with some timing. Depending on what hardware/emulation you use, the differences between the normal and fast lines may not look like much. A few reasons for this discrepency are that the span drawing routines are not incredibly optimized and are actually slower than the single pixel drawing for slopes near 1.0 due to setup overhead. Try replacing the drawing routines with empty, dummy routines to compare the actual speed of the line algorithms.
-
-The LINETEST.EXE program now wraps up with a sampling of anti-aliased lines:
-
-![AALine](https://github.com/dschmenk/Bresen-Span/blob/master/images/aaline.png)
+Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
+![GFXLIB](https://github.com/dschmenk/Bresen-Span/master/blobl/src/gfxlib/readme.md)
 
