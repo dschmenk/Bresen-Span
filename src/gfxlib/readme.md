@@ -24,6 +24,7 @@ LINETEST.EXE:
 ![AALine](https://github.com/dschmenk/Bresen-Span/blob/master/images/aaline.png)
 
 TRIFILL.EXE has additional flags to control filling and double buffering.
+![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
 
     -f0 : disable fill mode
     -f1 : enable fill mode (default)

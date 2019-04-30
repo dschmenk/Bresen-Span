@@ -142,10 +142,6 @@ But now the initialization has been completed. Look at what happens next in the 
 ```
 Bam! That's it.
 
-The LINETEST.EXE and FILLTRI.EXE programs take an argument to disable the dithering '-d0' and the dithered brush routines will be replaced with the solid color. The solid color routines are much faster than the dithered color code. The FILLTRI.EXE program also takes a '-f0' argument to disable the triangle fill code and use the default span routines. Check out how the same line and span routines can be repurposed to implement a polygon fill routine:
-
-![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
-
 ## And now for something completely different: Anti Aliased Lines
 
 A fast anti-aliased line routine using Wu's algorithm. This is more of a DDA implementation than a pure Bresenham. Calculating the slope in a 16.16 fixed point format provides the alpha component for free:
@@ -200,6 +196,7 @@ void aaline(int x1, int y1, int x2, int y2)
     ...
 }
 ```
+## GFXLib
 Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
-![GFXLIB](https://github.com/dschmenk/Bresen-Span/master/blobl/src/gfxlib/readme.md)
+![GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib)
 
