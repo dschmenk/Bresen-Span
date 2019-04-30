@@ -1,6 +1,6 @@
-
 #include <stdio.h>
 #include <bios.h>
+#include <dos.h>
 #include "gfx.h"
 
 /*

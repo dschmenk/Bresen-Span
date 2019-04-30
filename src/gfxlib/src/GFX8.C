@@ -1,4 +1,3 @@
-
 #include <bios.h>
 #include <dos.h>
 #include "gfx.h"
@@ -71,7 +70,7 @@ unsigned char amulr[8][8] =
 	{0x00, 0x01, 0x01, 0x02, 0x03, 0x04, 0x04, 0x05}, 
 	{0x00, 0x01, 0x02, 0x03, 0x03, 0x04, 0x05, 0x06}, 
 	{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07} 
-};	
+};      
 unsigned char amulg[8][8] = // Above table shifted left by 3
 {
 	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
@@ -82,7 +81,7 @@ unsigned char amulg[8][8] = // Above table shifted left by 3
 	{0x00, 0x08, 0x08, 0x10, 0x18, 0x20, 0x20, 0x28}, 
 	{0x00, 0x08, 0x10, 0x18, 0x18, 0x20, 0x28, 0x30}, 
 	{0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38}
-};	
+};      
 unsigned char amulb[8][4] = // Above table shifted left by 2
 {
 	{0x00, 0x00, 0x00, 0x00}, 
@@ -115,7 +114,6 @@ int gfxmode8(int modeflags)
     struct SREGS sregs;
     int red, grn, blu, c;
     unsigned char colors[256*3], far *far_colors;
-    unsigned int far *vidmem = (unsigned int far *)0xA0000000L;
 
     /*
      * Set mode 0x13 (320x200x8) and verify.
@@ -125,10 +123,10 @@ int gfxmode8(int modeflags)
     regs.x.ax = 0x0F00;
     int86(0x10, &regs, &regs);
     if (regs.h.al != 0x13)
-        return 0;
+	return 0;
     outpw(VGA_GC, 0xAA08); // Set pixmask
     if (inp(VGA_GC+1) != 0xAA) // Some EGA cards are stoopid and set mode 0x13
-        return 0;
+	return 0;
     page_addr[0] = (unsigned char far *)0xA0000000L;
     page_addr[1] = (unsigned char far *)0xA0004000L;
     renderbuff   = page_addr[0];
@@ -138,52 +136,52 @@ int gfxmode8(int modeflags)
     c = 0;
     if (modeflags & MODE_MONO)
     {
-        for (blu = 0; blu < 64; blu++)
-        {
-            colors[c++] = blu;
-            colors[c++] = blu;
-            colors[c++] = blu;
-        }
-        while (blu++ < 256)
-        {
-            colors[c++] = 255;
-            colors[c++] = 255;
-            colors[c++] = 255;
-        }
-        /*
-         * Fill greyscal mapping arrays
-         */
-        for (c = 0; c < 256+32; c++)
-            mapi[c] = (((unsigned char)(c * 255L / (256+32))) >> 2);
-        aapixel = pixel8amono;
-        color = mono8rgb;
+	for (blu = 0; blu < 64; blu++)
+	{
+	    colors[c++] = blu;
+	    colors[c++] = blu;
+	    colors[c++] = blu;
+	}
+	while (blu++ < 256)
+	{
+	    colors[c++] = 255;
+	    colors[c++] = 255;
+	    colors[c++] = 255;
+	}
+	/*
+	 * Fill greyscal mapping arrays
+	 */
+	for (c = 0; c < 256+32; c++)
+	    mapi[c] = (((unsigned char)(c * 255L / (256+32))) >> 2);
+	aapixel = pixel8amono;
+	color = mono8rgb;
     }
     else
     {
-        for (blu = 0; blu < 64; blu += 21)
-        {
-            for (grn = 0; grn < 64; grn += 9)
-            {
-                for (red = 0; red < 64; red += 9)
-                {
-                    colors[c++] = red;
-                    colors[c++] = grn;
-                    colors[c++] = blu;
-                }
-            }
-        }
-        /*
-         * Fill RGB mapping arrays
-         */
-        for (c = 0; c < 256+32; c++)
-        {
-            mapr[c] = (((unsigned char)(c * 255L / (256+32))) >> 5);
-            mapg[c] = (((unsigned char)(c * 255L / (256+32))) >> 2) & 0x38;
-        }
-        for (c = 0; c < 256+64; c++)
-            mapb[c] = ((unsigned char)(c * 255L / (256+64))) & 0xC0;
-        aapixel = pixel8argb;
-        color   = color8rgb;
+	for (blu = 0; blu < 64; blu += 21)
+	{
+	    for (grn = 0; grn < 64; grn += 9)
+	    {
+		for (red = 0; red < 64; red += 9)
+		{
+		    colors[c++] = red;
+		    colors[c++] = grn;
+		    colors[c++] = blu;
+		}
+	    }
+	}
+	/*
+	 * Fill RGB mapping arrays
+	 */
+	for (c = 0; c < 256+32; c++)
+	{
+	    mapr[c] = (((unsigned char)(c * 255L / (256+32))) >> 5);
+	    mapg[c] = (((unsigned char)(c * 255L / (256+32))) >> 2) & 0x38;
+	}
+	for (c = 0; c < 256+64; c++)
+	    mapb[c] = ((unsigned char)(c * 255L / (256+64))) & 0xC0;
+	aapixel = pixel8argb;
+	color   = color8rgb;
     }
     far_colors = colors;
     regs.x.ax  = 0x1012;
@@ -195,14 +193,14 @@ int gfxmode8(int modeflags)
     /*
      * Unchain memory (Mode Y)
      */
-    outpw(VGA_SEQ, 0x0604);	// Set memory mode disable chain4
+    outpw(VGA_SEQ, 0x0604);     // Set memory mode disable chain4
     outpw(VGA_SEQ, 0x0100); // Reset
     outp(VGA_MISC, 0x63);   // 400 scan lines, 25 MHz clock
     outpw(VGA_SEQ, 0x0300); // Restart
     outp(VGA_CRTC, 0x11);   // Unlock CRTC
     outp(VGA_CRTC+1, inp(VGA_CRTC+1) & 0x7F);
     for (c = 0; CRTC_320x200[c]; c++)
-        outpw(VGA_CRTC, CRTC_320x200[c]);
+	outpw(VGA_CRTC, CRTC_320x200[c]);
     outp(VGA_CRTC, 0x11);   // Lock CRTC
     outp(VGA_CRTC+1, inp(VGA_CRTC+1) | 0x80);
     outpw(VGA_GC, 0xFF08); // Set pixmask
@@ -216,15 +214,15 @@ int gfxmode8(int modeflags)
     aavspan = vspan8;
     if (modeflags & MODE_NODITHER)
     {
-        pixel = pixel8;
-        hspan = hspan8;
-        vspan = vspan8;
+	pixel = pixel8;
+	hspan = hspan8;
+	vspan = vspan8;
     }
     else
     {
-        pixel = pixel8brush;
-        hspan = hspan8brush;
-        vspan = vspan8brush;
+	pixel = pixel8brush;
+	hspan = hspan8brush;
+	vspan = vspan8brush;
     }
     return 1;
 }
@@ -257,10 +255,10 @@ static void mono8rgb(int red, int grn, int blu)
     brush     = (unsigned char *)brush8;
     for (row = 0; row < 4; row++)
     {
-        *brush++ = mapi[i + monodither[row][0]];
-        *brush++ = mapi[i + monodither[row][1]];
-        *brush++ = mapi[i + monodither[row][2]];
-        *brush++ = mapi[i + monodither[row][3]];
+	*brush++ = mapi[i + monodither[row][0]];
+	*brush++ = mapi[i + monodither[row][1]];
+	*brush++ = mapi[i + monodither[row][2]];
+	*brush++ = mapi[i + monodither[row][3]];
     }
     /*
      * Copy brush to off-screen memory.
@@ -268,11 +266,11 @@ static void mono8rgb(int red, int grn, int blu)
     pscan = (unsigned char far *)(0xA0000000L + 80*200);
     for (col = 0; col < 4; col++)
     {
-        outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
-        pscan[0] = brush8[0][col];
-        pscan[1] = brush8[1][col];
-        pscan[2] = brush8[2][col];
-        pscan[3] = brush8[3][col];
+	outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
+	pscan[0] = brush8[0][col];
+	pscan[1] = brush8[1][col];
+	pscan[2] = brush8[2][col];
+	pscan[3] = brush8[3][col];
     }
 }
 static void color8rgb(int red, int grn, int blu)
@@ -288,14 +286,14 @@ static void color8rgb(int red, int grn, int blu)
     brush     = (unsigned char *)brush8;
     for (row = 0; row < 4; row++)
     {
-        dither = colordither[row][0];
-        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
-        dither = colordither[row][1];
-        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
-        dither = colordither[row][2];
-        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
-        dither = colordither[row][3];
-        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+	dither = colordither[row][0];
+	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+	dither = colordither[row][1];
+	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+	dither = colordither[row][2];
+	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+	dither = colordither[row][3];
+	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
     }
     /*
      * Copy brush to off-screen memory.
@@ -303,11 +301,10 @@ static void color8rgb(int red, int grn, int blu)
     pscan = (unsigned char far *)(0xA0000000L + 80*200);
     for (col = 0; col < 4; col++)
     {
-        outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
-        pscan[0] = brush8[0][col];
-        pscan[1] = brush8[1][col];
-        pscan[2] = brush8[2][col];
-        pscan[3] = brush8[3][col];
+	outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
+	pscan[0] = brush8[0][col];
+	pscan[1] = brush8[1][col];
+	pscan[2] = brush8[2][col];
+	pscan[3] = brush8[3][col];
     }
 }
-

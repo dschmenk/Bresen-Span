@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <bios.h>
+#include <dos.h>
 #include "gfx.h"
 
 #define SHADOW_PAGE     1
@@ -207,8 +208,6 @@ int gfxmode2(int modeflags)
  */
 void render2(int page)
 {
-    union REGS regs;
-
     if (render_page == FRONT_PAGE)
         shadow |= SHADOW_DIRTY;
     render_page = page & 1;
@@ -258,5 +257,4 @@ static void color2rgb(int red, int grn, int blu)
     i        += 0x01; if (i > 0x0F) i = 0x0F;
     idx2      = ((i << 4) & 0xC0) | ((i << 2) & 0x30) | (i & 0x0C) | ((i >> 2) & 0x03);
 }
-
 

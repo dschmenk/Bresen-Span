@@ -30,13 +30,22 @@ TRIFILL.EXE has additional flags to control filling and double buffering.
     
 SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
 
+SPHERE.EXE displays different tesselations of the three Platonic Solids with triangluar faces. The solids are the Octahedron, Tetrahedron, and Icosahedron. The other two, the Cube and Dodecahedron, have square and hexagonal faces. The options are:
+
+    -a0 : disable anti-aliased lines (default)
+    -a1 : enable anti-aliased lines
+    -h0 : disable hidden liness
+    -h1 : enable hidden lines (default)
+    -s<0..4> : tesselation level. 0 = no tesselation. One solid can't go to 4 :-)
+    -p<0..2> : chose one of three objects to tesselate
+
 SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and also has these additional flags:
 
     -f0 : disable fill mode
     -f1 : enable fill mode (default)
     -a0 : disable anti-aliased outline (default)
     -a1 : enable anti-aliased outline
-    -h0 : disable hidden line
+    -h0 : disable hidden lines
     -h1 : enable hidden lines (default)
 
 ![NCC1701](https://github.com/dschmenk/Bresen-Span/blob/master/images/NCC1701.png)
