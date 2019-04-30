@@ -198,5 +198,5 @@ void aaline(int x1, int y1, int x2, int y2)
 ```
 ## GFXLib
 Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
-![GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib)
+[GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib)
 
