@@ -25,10 +25,14 @@ Sample programs: These programs just demonstrate the abilities of the library. T
     
 GREYRAMP.EXE
 
+![GreyRamp](https://github.com/dschmenk/Bresen-Span/blob/master/images/greyramp.png)
+
 LINETEST.EXE:
+
 ![AALine](https://github.com/dschmenk/Bresen-Span/blob/master/images/aaline.png)
 
 TRIFILL.EXE has additional flags to control filling and double buffering.
+
 ![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
 
     -f0 : disable fill mode
@@ -39,6 +43,8 @@ TRIFILL.EXE has additional flags to control filling and double buffering.
     
 SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
 
+![DeskPro](https://github.com/dschmenk/Bresen-Span/blob/master/images/deskpro.png)
+
 SPHERE.EXE displays different tesselations of the three Platonic Solids with triangluar faces. The solids are the Octahedron, Tetrahedron, and Icosahedron. The other two, the Cube and Dodecahedron, have square and hexagonal faces. The options are:
 
     -a0 : disable anti-aliased lines (default)
@@ -47,6 +53,8 @@ SPHERE.EXE displays different tesselations of the three Platonic Solids with tri
     -h1 : enable hidden lines (default)
     -s<0..4> : tesselation level. 0 = no tesselation. One solid can't go to 4 :-)
     -p<0..2> : chose one of three objects to tesselate
+
+![Sphere](https://github.com/dschmenk/Bresen-Span/blob/master/images/sphere.png)
 
 SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and also has these additional flags:
 
