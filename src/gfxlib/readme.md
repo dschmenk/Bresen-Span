@@ -1,5 +1,6 @@
 # GFXLib
-========
+--------
+
 Here are x86 sample programs using the span-based and anti-alias line drawing routines. This is a graphics library I'm writing to support the VGA, EGA, and CGA adapters in a consistent way. I got tired of rewriting tests and demos for all my retro PCs with their different graphics cards. So this new library works by finding commonality between the graphics adapters and writing an RGB API to hide the color depth differences. I brought over the 16 color, 4BPP EGA dithering algorithm to supplement the 256 color, 8BPP VGA dithering algorithm used here previously. The CGA dithereing works similarly, but with even more constraints - I'll get to that shortly.
 
 Finding commonality: The one graphics resolution in common with all three adapters that has the most color depth on each is 320x200. That is the only supported resolution for this library.  An attempt is made to map RGB colors to each graphics mode.
