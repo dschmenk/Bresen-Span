@@ -41,7 +41,7 @@ TRIFILL.EXE has additional flags to control filling and double buffering.
     -a1 : enable anti-aliased outline (default)
     -b  : buffer the rendering to back page and flip on VSYNC to display
     
-SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included. `SHOWPBM DESKPRO.PGM`:
+SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included. `SHOWPBM DESKPRO.PNM`:
 
 ![DeskPro](https://github.com/dschmenk/Bresen-Span/blob/master/images/deskpro.png)
 
