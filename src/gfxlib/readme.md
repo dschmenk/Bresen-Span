@@ -33,14 +33,14 @@ LINETEST.EXE:
 
 TRIFILL.EXE has additional flags to control filling and double buffering.
 
-![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
-
     -f0 : disable fill mode
     -f1 : enable fill mode (default)
     -a0 : disable anti-aliased outline
     -a1 : enable anti-aliased outline (default)
     -b  : buffer the rendering to back page and flip on VSYNC to display
     
+![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
+
 SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included. `SHOWPBM DESKPRO.PNM`:
 
 ![DeskPro](https://github.com/dschmenk/Bresen-Span/blob/master/images/deskpro.png)
