@@ -41,7 +41,7 @@ TRIFILL.EXE has additional flags to control filling and double buffering.
     -a1 : enable anti-aliased outline (default)
     -b  : buffer the rendering to back page and flip on VSYNC to display
     
-SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included.
+SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included. `SHOWPBM DESKPRO.PGM`:
 
 ![DeskPro](https://github.com/dschmenk/Bresen-Span/blob/master/images/deskpro.png)
 
@@ -64,6 +64,8 @@ SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and als
     -a1 : enable anti-aliased outline
     -h0 : disable hidden lines
     -h1 : enable hidden lines (default)
+
+Following image `SHOW3D -m -h0 NCC1701.ZOF`:
 
 ![NCC1701](https://github.com/dschmenk/Bresen-Span/blob/master/images/NCC1701.png)
 
