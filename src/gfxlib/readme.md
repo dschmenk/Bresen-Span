@@ -66,3 +66,11 @@ SHOW3D.EXE display a 3D object defined in a file with the .ZOF extension and als
     -h1 : enable hidden lines (default)
 
 ![NCC1701](https://github.com/dschmenk/Bresen-Span/blob/master/images/NCC1701.png)
+
+RAY.EXE is a minimal ray tracer. It takes three mandatory arguments and an optional output filename for the result:
+
+    RAY <octree depth: 1 .. 4> <position file> <polygon file> [greyscale PBM image filename]
+    
+This image generated with: `RAY 3 SHUTTLE.POS SHUTTLE.PLY SHUTTLE.PGM`:
+    
+![Shuttle](https://github.com/dschmenk/Bresen-Span/blob/master/images/ray.png)
