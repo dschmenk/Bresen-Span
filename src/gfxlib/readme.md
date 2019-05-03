@@ -71,6 +71,6 @@ RAY.EXE is a minimal ray tracer. It takes three mandatory arguments and an optio
 
     RAY <octree depth: 1 .. 4> <position file> <polygon file> [greyscale PBM image filename]
     
-This image generated with: `RAY 3 SHUTTLE.POS SHUTTLE.PLY SHUTTLE.PGM`:
+Following image shows `RAY 3 SHUTTLE.POS SHUTTLE.PLY SHUTTLE.PGM` in progress:
     
 ![Shuttle](https://github.com/dschmenk/Bresen-Span/blob/master/images/ray.png)
