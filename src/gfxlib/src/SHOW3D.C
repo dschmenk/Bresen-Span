@@ -52,7 +52,7 @@ unsigned NumSorted;
 
 #define BLACK           0
 
-#define	DIST            150.0
+#define	DIST            150
 #define MAX_DIST        600.0
 #define MIN_DIST        0.0
 
@@ -64,10 +64,10 @@ typedef struct
     float xWorld;
     float yWorld;
     float zWorld;
-    float xScreen;
-    float yScreen;
-    float zScreen;
-    float Shade;
+    int xScreen;
+    int yScreen;
+    int zScreen;
+    int Shade;
 } vertex, * pvertex;
 
 typedef struct
@@ -80,7 +80,7 @@ typedef struct
 pvertex   Vertex;
 ppolygon  Polygon;
 polygon **SortedPoly;
-float    *SortedDepth;
+int      *SortedDepth;
 
 /*
  * sine and cosine lookup tables
@@ -192,7 +192,7 @@ void InitRender(char * ObjFile)
             exit(1);
         }
         SortedPoly = (polygon **)malloc(sizeof(polygon *) * (NumPolys+1));
-        SortedDepth = malloc(sizeof(float) * (NumPolys+1));
+        SortedDepth = malloc(sizeof(int) * (NumPolys+1));
         /*
          * Read in the verteces
          */
@@ -279,10 +279,10 @@ void WorldToScreen(void)
 	}
 }
 
-void UpdateRender(void)
+void UpdateRender(int cull)
 {
-    int   np, i, j, p, c, SkipPoly;
-    float x1, y1, x2, y2, zMin;
+    int   np, i, j, p, c, SkipPoly, zMin;
+    long  v1x, v1y, v2x, v2y;
 
     /*
      * Update view coordinates
@@ -294,51 +294,62 @@ void UpdateRender(void)
     color(0, 0, 0);
     clear();
     NumSorted = 0;
-    SortedDepth[0] = 0.0;
     for (np = 0; np < NumPolys; np++)
     {
-        SkipPoly = 0;
-        zMin     = MAX_DIST;
-        for (j = 0; j < Polygon[np].Count; j++)
+        if (cull)
         {
-            if (Vertex[Polygon[np].Index[j]].zScreen < 0.0)
-            {
-                SkipPoly = 1;
-                break;
-            }
-            if (Vertex[Polygon[np].Index[j]].zScreen < zMin)
-                zMin = Vertex[Polygon[np].Index[j]].zScreen;
+            v1x      = Vertex[Polygon[np].Index[1]].xScreen - Vertex[Polygon[np].Index[0]].xScreen;
+            v2x      = Vertex[Polygon[np].Index[2]].xScreen - Vertex[Polygon[np].Index[0]].xScreen;
+            v1y      = Vertex[Polygon[np].Index[1]].yScreen - Vertex[Polygon[np].Index[0]].yScreen;
+            v2y      = Vertex[Polygon[np].Index[2]].yScreen - Vertex[Polygon[np].Index[0]].yScreen;
+            SkipPoly = (v1x * v2y - v2x * v1y) >= 0;
         }
+        else
+            SkipPoly = 0;
         if (!SkipPoly)
         {
-            /*
-             * Insert polygon into sorted list
-             */
-            j = NumSorted / 2;
-            p = j / 2;
-            while (p)
+            zMin     = MAX_DIST;
+            for (j = 0; j < Polygon[np].Count; j++)
             {
-                if (zMin < SortedDepth[j])
-                    j -= p;
-                else
-                    j += p;
-                p /= 2;
+                if (Vertex[Polygon[np].Index[j]].zScreen < 0)
+                {
+                    SkipPoly = 1;
+                    break;
+                }
+                if (Vertex[Polygon[np].Index[j]].zScreen < zMin)
+                    zMin = Vertex[Polygon[np].Index[j]].zScreen;
             }
-            while (j < NumSorted && zMin > SortedDepth[j]) j++;
-            while (j && zMin < SortedDepth[j-1]) j--;
-            for (i = NumSorted; i > j; i--)
+            if (!SkipPoly)
             {
-                SortedPoly[i]  = SortedPoly[i-1];
-                SortedDepth[i] = SortedDepth[i-1];
+                /*
+                * Insert polygon into sorted list
+                */
+                j = NumSorted / 2;
+                p = j / 2;
+                while (p)
+                {
+                    if (zMin < SortedDepth[j])
+                        j -= p;
+                    else
+                        j += p;
+                    p /= 2;
+                }
+                while (j < NumSorted && zMin > SortedDepth[j]) j++;
+                while (j && zMin < SortedDepth[j-1]) j--;
+                for (i = NumSorted; i > j; i--)
+                {
+                    SortedPoly[i]  = SortedPoly[i-1];
+                    SortedDepth[i] = SortedDepth[i-1];
+                }
+                SortedPoly[j]  = &Polygon[np];
+                SortedDepth[j] = zMin;
+                NumSorted++;
             }
-            SortedPoly[j]  = &Polygon[np];
-            SortedDepth[j] = zMin;
-            NumSorted++;
         }
     }
     for (np = NumSorted - 1; np >= 0; np--)
     {
-        c = DIST * 3.0 - SortedDepth[np] * 1.4;
+        c = 256 - SortedDepth[np];
         if (c > 255) c = 255;
         if (c < 0)   c = 0;
         if (fill)
@@ -374,11 +385,12 @@ void UpdateRender(void)
 
 int main(int argc, char *argv[])
 {
-    int mode;
+    int mode, cull;
 
     fill   = 1;
     aa     = 0;
     hidden = 1;
+    cull   = 0;
     mode   = MODE_BEST;
     while (argc > 1 && argv[1][0] == '-')
     {
@@ -388,6 +400,8 @@ int main(int argc, char *argv[])
             aa = argv[1][2] - '0';
         else if (argv[1][1] == 'h')
             hidden = argv[1][2] - '0';
+        else if (argv[1][1] == 'c')
+            cull = argv[1][2] - '0';
         else if (argv[1][1] == 'd')
             switch (argv[1][2] - '0')
             {
@@ -414,7 +428,7 @@ int main(int argc, char *argv[])
     rot  = 0;
     do
     {
-        UpdateRender();
+        UpdateRender(cull);
         rot += 5;
         if (rot >= 360)
             rot = 0;

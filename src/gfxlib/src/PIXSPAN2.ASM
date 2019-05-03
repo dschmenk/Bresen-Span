@@ -12,7 +12,8 @@ CONST	ENDS
 _BSS	SEGMENT  WORD PUBLIC 'BSS'
 _BSS	ENDS
 DGROUP	GROUP	CONST, _BSS, _DATA
-	ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
+
+        ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
 
 EXTRN   _renderbuff:NEAR
 EXTRN   _scanaddr:NEAR
@@ -20,9 +21,9 @@ EXTRN   _brush2:NEAR
 EXTRN   _idx2:NEAR
 EXTRN   _amul2:NEAR
 
-_TEXT      SEGMENT
-	ASSUME	CS: _TEXT
-	PUBLIC	_clear2
+_TEXT   SEGMENT
+
+        PUBLIC	_clear2
 ;void clear2(void)
 _clear2         PROC NEAR
         push    di
@@ -45,8 +46,8 @@ _copypage2      PROC NEAR
         push    di
         push    si
         push    ds
-        les     di,DWORD PTR (bp+8)     ;destination page
-        lds     si,DWORD PTR (bp+4)     ;source page
+        les     di,DWORD PTR [bp+8]  ;destination page
+        lds     si,DWORD PTR [bp+4]  ;source page
         mov     cx,02000h
         rep     movsw
         pop     ds

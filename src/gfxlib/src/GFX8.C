@@ -62,36 +62,36 @@ unsigned char idx8, rgb8[3], brush8[4][4];
 //
 unsigned char amulr[8][8] = 
 {
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01}, 
-	{0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02}, 
-	{0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03}, 
-	{0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x04}, 
-	{0x00, 0x01, 0x01, 0x02, 0x03, 0x04, 0x04, 0x05}, 
-	{0x00, 0x01, 0x02, 0x03, 0x03, 0x04, 0x05, 0x06}, 
-	{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07} 
+    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
+    {0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01}, 
+    {0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02}, 
+    {0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03}, 
+    {0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x04}, 
+    {0x00, 0x01, 0x01, 0x02, 0x03, 0x04, 0x04, 0x05}, 
+    {0x00, 0x01, 0x02, 0x03, 0x03, 0x04, 0x05, 0x06}, 
+    {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07} 
 };      
 unsigned char amulg[8][8] = // Above table shifted left by 3
 {
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x00, 0x08, 0x08, 0x08, 0x08}, 
-	{0x00, 0x00, 0x08, 0x08, 0x08, 0x08, 0x10, 0x10}, 
-	{0x00, 0x00, 0x08, 0x08, 0x10, 0x10, 0x18, 0x18}, 
-	{0x00, 0x08, 0x08, 0x10, 0x10, 0x18, 0x18, 0x20}, 
-	{0x00, 0x08, 0x08, 0x10, 0x18, 0x20, 0x20, 0x28}, 
-	{0x00, 0x08, 0x10, 0x18, 0x18, 0x20, 0x28, 0x30}, 
-	{0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38}
+    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
+    {0x00, 0x00, 0x00, 0x00, 0x08, 0x08, 0x08, 0x08}, 
+    {0x00, 0x00, 0x08, 0x08, 0x08, 0x08, 0x10, 0x10}, 
+    {0x00, 0x00, 0x08, 0x08, 0x10, 0x10, 0x18, 0x18}, 
+    {0x00, 0x08, 0x08, 0x10, 0x10, 0x18, 0x18, 0x20}, 
+    {0x00, 0x08, 0x08, 0x10, 0x18, 0x20, 0x20, 0x28}, 
+    {0x00, 0x08, 0x10, 0x18, 0x18, 0x20, 0x28, 0x30}, 
+    {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38}
 };      
 unsigned char amulb[8][4] = // Above table shifted left by 2
 {
-	{0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x40, 0x40}, 
-	{0x00, 0x00, 0x40, 0x40}, 
-	{0x00, 0x40, 0x40, 0x80}, 
-	{0x00, 0x40, 0x40, 0x80}, 
-	{0x00, 0x40, 0x80, 0xC0}, 
-	{0x00, 0x40, 0x80, 0xC0}
+    {0x00, 0x00, 0x00, 0x00}, 
+    {0x00, 0x00, 0x00, 0x00}, 
+    {0x00, 0x00, 0x40, 0x40}, 
+    {0x00, 0x00, 0x40, 0x40}, 
+    {0x00, 0x40, 0x40, 0x80}, 
+    {0x00, 0x40, 0x40, 0x80}, 
+    {0x00, 0x40, 0x80, 0xC0}, 
+    {0x00, 0x40, 0x80, 0xC0}
 };
 
 void flip8(void);
@@ -108,6 +108,28 @@ void pixel8rgb(int x, int y, int red, int grn, int blu);
 void pixel8argb(int x, int y, int alpha);
 void pixel8amono(int x, int y, int alpha);
 
+static void fill8rg(int xl, int xr, int y)
+{
+    do
+    {
+        mapr[xl] =  y >> 5;         // (c * 255L / (256+32))) >> 5)
+        mapg[xl] = (y >> 2) & 0x38; // (c * 255L / (256+32))) >> 2) & 0x38
+    } while (++xl <= xr);
+}
+static void fill8b(int xl, int xr, int y)
+{
+    do
+    {
+        mapb[xl] = y & 0xC0; // (c * 255L / (256+64)) & 0xC0
+    } while (++xl <= xr);
+}
+static void fill8i(int xl, int xr, int y)
+{
+    do
+    {
+        mapi[xl] = y >> 2; // (c * 255L / (256+32)) >> 2);
+    } while (++xl <= xr);
+}
 int gfxmode8(int modeflags)
 {
     union  REGS  regs;
@@ -123,10 +145,10 @@ int gfxmode8(int modeflags)
     regs.x.ax = 0x0F00;
     int86(0x10, &regs, &regs);
     if (regs.h.al != 0x13)
-	return 0;
+    return 0;
     outpw(VGA_GC, 0xAA08); // Set pixmask
     if (inp(VGA_GC+1) != 0xAA) // Some EGA cards are stoopid and set mode 0x13
-	return 0;
+    return 0;
     page_addr[0] = (unsigned char far *)0xA0000000L;
     page_addr[1] = (unsigned char far *)0xA0004000L;
     renderbuff   = page_addr[0];
@@ -136,52 +158,64 @@ int gfxmode8(int modeflags)
     c = 0;
     if (modeflags & MODE_MONO)
     {
-	for (blu = 0; blu < 64; blu++)
-	{
-	    colors[c++] = blu;
-	    colors[c++] = blu;
-	    colors[c++] = blu;
-	}
-	while (blu++ < 256)
-	{
-	    colors[c++] = 255;
-	    colors[c++] = 255;
-	    colors[c++] = 255;
-	}
-	/*
-	 * Fill greyscal mapping arrays
-	 */
-	for (c = 0; c < 256+32; c++)
-	    mapi[c] = (((unsigned char)(c * 255L / (256+32))) >> 2);
-	aapixel = pixel8amono;
-	color = mono8rgb;
+        for (blu = 0; blu < 64; blu++)
+        {
+            colors[c++] = blu;
+            colors[c++] = blu;
+            colors[c++] = blu;
+        }
+        while (blu++ < 256)
+        {
+            colors[c++] = 255;
+            colors[c++] = 255;
+            colors[c++] = 255;
+        }
+        /*
+         * Fill greyscal mapping arrays
+         */
+#if 1
+        hspan = fill8i;
+        line(0, 0, 256+32-1, 255); // Use span line routine to lerp
+#else
+        for (c = 0; c < 256+32; c++)
+            mapi[c] = (((unsigned char)(c * 255L / (256+32))) >> 2);
+#endif
+        aapixel = pixel8amono;
+        color = mono8rgb;
     }
     else
     {
-	for (blu = 0; blu < 64; blu += 21)
-	{
-	    for (grn = 0; grn < 64; grn += 9)
-	    {
-		for (red = 0; red < 64; red += 9)
-		{
-		    colors[c++] = red;
-		    colors[c++] = grn;
-		    colors[c++] = blu;
-		}
-	    }
-	}
-	/*
-	 * Fill RGB mapping arrays
-	 */
-	for (c = 0; c < 256+32; c++)
-	{
-	    mapr[c] = (((unsigned char)(c * 255L / (256+32))) >> 5);
-	    mapg[c] = (((unsigned char)(c * 255L / (256+32))) >> 2) & 0x38;
-	}
-	for (c = 0; c < 256+64; c++)
-	    mapb[c] = ((unsigned char)(c * 255L / (256+64))) & 0xC0;
-	aapixel = pixel8argb;
-	color   = color8rgb;
+        for (blu = 0; blu < 64; blu += 21)
+        {
+            for (grn = 0; grn < 64; grn += 9)
+            {
+                for (red = 0; red < 64; red += 9)
+                {
+                    colors[c++] = red;
+                    colors[c++] = grn;
+                    colors[c++] = blu;
+                }
+            }
+        }
+        /*
+         * Fill RGB mapping arrays
+         */
+#if 1
+        hspan = fill8rg;
+        line(0, 0, 256+32-1, 255); // Use span line routine to lerp
+        hspan = fill8b;
+        line(0, 0, 256+64-1, 255);
+#else
+        for (c = 0; c < 256+32; c++)
+        {
+            mapr[c] = (((unsigned char)(c * 255L / (256+32))) >> 5);
+            mapg[c] = (((unsigned char)(c * 255L / (256+32))) >> 2) & 0x38;
+        }
+        for (c = 0; c < 256+64; c++)
+            mapb[c] = ((unsigned char)(c * 255L / (256+64))) & 0xC0;
+#endif
+        aapixel = pixel8argb;
+        color   = color8rgb;
     }
     far_colors = colors;
     regs.x.ax  = 0x1012;
@@ -200,7 +234,7 @@ int gfxmode8(int modeflags)
     outp(VGA_CRTC, 0x11);   // Unlock CRTC
     outp(VGA_CRTC+1, inp(VGA_CRTC+1) & 0x7F);
     for (c = 0; CRTC_320x200[c]; c++)
-	outpw(VGA_CRTC, CRTC_320x200[c]);
+        outpw(VGA_CRTC, CRTC_320x200[c]);
     outp(VGA_CRTC, 0x11);   // Lock CRTC
     outp(VGA_CRTC+1, inp(VGA_CRTC+1) | 0x80);
     outpw(VGA_GC, 0xFF08); // Set pixmask
@@ -214,15 +248,15 @@ int gfxmode8(int modeflags)
     aavspan = vspan8;
     if (modeflags & MODE_NODITHER)
     {
-	pixel = pixel8;
-	hspan = hspan8;
-	vspan = vspan8;
+        pixel = pixel8;
+        hspan = hspan8;
+        vspan = vspan8;
     }
     else
     {
-	pixel = pixel8brush;
-	hspan = hspan8brush;
-	vspan = vspan8brush;
+        pixel = pixel8brush;
+        hspan = hspan8brush;
+        vspan = vspan8brush;
     }
     return 1;
 }
@@ -237,7 +271,7 @@ static void flip8(void)
     render_page  ^= 1;
     renderbuff    =               page_addr[render_page];
     displaybuff   = (unsigned int)page_addr[display_page];
-    while(  inp(VGA_STATUS) & 0x08);  // Wait for current retrace
+    while(inp(VGA_STATUS) & 0x08);  // Wait for current retrace
     outpw(VGA_CRTC,(displaybuff & 0xFF00) | 0x0C);
     while(!(inp(VGA_STATUS) & 0x08)); // Wait for next retrace
 }
@@ -255,10 +289,10 @@ static void mono8rgb(int red, int grn, int blu)
     brush     = (unsigned char *)brush8;
     for (row = 0; row < 4; row++)
     {
-	*brush++ = mapi[i + monodither[row][0]];
-	*brush++ = mapi[i + monodither[row][1]];
-	*brush++ = mapi[i + monodither[row][2]];
-	*brush++ = mapi[i + monodither[row][3]];
+        *brush++ = mapi[i + monodither[row][0]];
+        *brush++ = mapi[i + monodither[row][1]];
+        *brush++ = mapi[i + monodither[row][2]];
+        *brush++ = mapi[i + monodither[row][3]];
     }
     /*
      * Copy brush to off-screen memory.
@@ -266,11 +300,11 @@ static void mono8rgb(int red, int grn, int blu)
     pscan = (unsigned char far *)(0xA0000000L + 80*200);
     for (col = 0; col < 4; col++)
     {
-	outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
-	pscan[0] = brush8[0][col];
-	pscan[1] = brush8[1][col];
-	pscan[2] = brush8[2][col];
-	pscan[3] = brush8[3][col];
+        outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
+        pscan[0] = brush8[0][col];
+        pscan[1] = brush8[1][col];
+        pscan[2] = brush8[2][col];
+        pscan[3] = brush8[3][col];
     }
 }
 static void color8rgb(int red, int grn, int blu)
@@ -286,14 +320,14 @@ static void color8rgb(int red, int grn, int blu)
     brush     = (unsigned char *)brush8;
     for (row = 0; row < 4; row++)
     {
-	dither = colordither[row][0];
-	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
-	dither = colordither[row][1];
-	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
-	dither = colordither[row][2];
-	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
-	dither = colordither[row][3];
-	*brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+        dither = colordither[row][0];
+        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+        dither = colordither[row][1];
+        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+        dither = colordither[row][2];
+        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
+        dither = colordither[row][3];
+        *brush++ = mapr[red+dither] | mapg[grn+dither] | mapb[blu+dither*2];
     }
     /*
      * Copy brush to off-screen memory.
@@ -301,10 +335,11 @@ static void color8rgb(int red, int grn, int blu)
     pscan = (unsigned char far *)(0xA0000000L + 80*200);
     for (col = 0; col < 4; col++)
     {
-	outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
-	pscan[0] = brush8[0][col];
-	pscan[1] = brush8[1][col];
-	pscan[2] = brush8[2][col];
-	pscan[3] = brush8[3][col];
+        outpw(VGA_SEQ, (0x0100 << col) | 0x02); // Set write plane enable
+        pscan[0] = brush8[0][col];
+        pscan[1] = brush8[1][col];
+        pscan[2] = brush8[2][col];
+        pscan[3] = brush8[3][col];
     }
 }
+

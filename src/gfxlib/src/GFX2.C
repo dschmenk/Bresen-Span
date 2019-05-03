@@ -12,7 +12,7 @@ extern unsigned char far *renderbuff;
 unsigned char shadow, far *page_shadow[2];
 unsigned char idx2, rgb2[3];
 unsigned int scanaddr[200];
-unsigned long brush2;
+unsigned long brush2 = 0;
 unsigned long monodither2[64] = {
     0x00000000, // 0
     0x00000040, // 1
@@ -135,24 +135,28 @@ int gfxmode2(int modeflags)
     if (regs.h.al != 0x04)
         return 0;
     /*
-     * Fill in scanline/framebuffer addresses
-     */
-    for (scan = 0; scan < 200; scan++)
-        scanaddr[scan] = (scan >> 1) * 80 + (scan & 1) * 8192;
-    /*
      * Allocate shadow buffers.
      */
-    regs.x.ax = 0x4800; // Allocate bx paragraphs
-    regs.x.bx = 0x0800; // 32K (2048 paragraphs)
+    renderbuff = NULL;
+    regs.x.ax  = 0x4800; // Allocate bx paragraphs
+    regs.x.bx  = 0x0800; // 32K (2048 paragraphs)
     int86(0x21, &regs, &regs);
-    page_shadow[0] = (unsigned char far *)((unsigned long)regs.x.ax << 16);
-    page_shadow[1] = (unsigned char far *)((unsigned long)regs.x.ax << 16) + 0x4000;
-    page_addr[1]   = page_shadow[0];
-    shadow         = SHADOW_DIRTY;
-    renderbuff     = page_shadow[0]; clear2();
-    renderbuff     = page_shadow[1]; clear2();
+    if (!regs.x.cflag)
+        renderbuff = (unsigned char far *)((unsigned long)regs.x.ax << 16);
+    if (!renderbuff)
+    {
+        restoremode();
+        return 0;
+    }
+    page_shadow[0] = renderbuff;
+    page_shadow[1] = renderbuff + 0x4000;
+    clear2();
+    renderbuff     = page_shadow[1];
+    clear2();
     renderbuff     = (unsigned char far *)0xB8000000L;
     page_addr[0]   = renderbuff;
+    page_addr[1]   = page_shadow[0];
+    shadow         = SHADOW_DIRTY;
     if (*(unsigned int far *)0xC0000000L == 0xAA55) // On EGA/VGA or CGA?
     {
         /*
@@ -201,6 +205,11 @@ int gfxmode2(int modeflags)
         hspan = hspan2brush;
         vspan = vspan2brush;
     }
+    /*
+     * Fill in scanline/framebuffer addresses
+     */
+    for (scan = 0; scan < 200; scan++)
+        scanaddr[scan] = (scan >> 1) * 80 + (scan & 1) * 8192;
     return 1;
 }
 /*
