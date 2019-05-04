@@ -1,20 +1,188 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "gfx.h"
+
+#define SCREEN_ASPECT   (320.0/200.0)
+
+#define greyscan    grnscan
+
+unsigned char redscan[320];
+unsigned char grnscan[320];
+unsigned char bluscan[320];
+unsigned int  redaccum[320];
+unsigned int  grnaccum[320];
+unsigned int  bluaccum[320];
+unsigned char gamma[256];
+
+FILE *pbmfile;
+int pbmwidth, pbmheight, pbmdepth;
+int left, right, top, bottom;
+
+void renderscanrgb(int scan)
+{
+    int x;
+    for (x = 0; x < 320; x++)
+    {
+        color(redscan[x], grnscan[x], bluscan[x]);
+        pixel(x, scan);
+    }
+}
+void renderscangrey(int scan)
+{
+    int x;
+    for (x = 0; x < 320; x++)
+    {
+        color(greyscan[x], greyscan[x], greyscan[x]);
+        pixel(x, scan);
+    }
+}
+/*
+ * Image stretch with help of span line routine
+ */
+void hstretchrgb(int xl, int xr, int y)
+{
+    unsigned int r, g, b;
+
+    r = gamma[getc(pbmfile)];
+    g = gamma[getc(pbmfile)];
+    b = gamma[getc(pbmfile)];
+    do
+    {
+        redscan[xl] = r;
+        grnscan[xl] = g;
+        bluscan[xl] = b;
+    } while (++xl <= xr);
+}
+void hstretchgrey(int xl, int xr, int y)
+{
+    unsigned int grey;
+
+    grey = gamma[getc(pbmfile)];
+    do
+    {
+        greyscan[xl] = grey;
+    } while (++xl <= xr);
+}
+void hshrinkrgb(int x, int yt, int yb)
+{
+    unsigned int r, g, b, n;
+
+    r = g = b = 0;
+    n = yb - yt + 1;
+    do
+    {
+        r += gamma[getc(pbmfile)];
+        g += gamma[getc(pbmfile)];
+        b += gamma[getc(pbmfile)];
+    } while (++yt <= yb);
+    redscan[x] = r / n;
+    grnscan[x] = g / n;
+    bluscan[x] = b / n;
+}
+void hshrinkgrey(int x, int yt, int yb)
+{
+    unsigned int g, n;
+
+    g = 0;
+    n = yb - yt + 1;
+    do
+    {
+        g += gamma[getc(pbmfile)];
+    } while (++yt <= yb);
+    greyscan[x] = g / n;
+}
+void vstretchrgb(int xl, int xr, int y)
+{
+    hspan = hstretchrgb;
+    vspan = hshrinkrgb;
+    line(left, 0, right, pbmwidth-1);
+    do
+    {
+        renderscanrgb(xl);
+    } while (++xl <= xr);
+    hspan = vstretchrgb;
+}
+void vstretchgrey(int xl, int xr, int y)
+{
+    hspan = hstretchgrey;
+    vspan = hshrinkgrey;
+    line(left, 0, right, pbmwidth-1);
+    do
+    {
+        renderscangrey(xl);
+    } while (++xl <= xr);
+    hspan = vstretchgrey;
+}
+void vshrinkrgb(int x, int yt, int yb)
+{
+    unsigned int n, p;
+
+    memset(redaccum, 0, 320 * sizeof(unsigned int));
+    memset(grnaccum, 0, 320 * sizeof(unsigned int));
+    memset(bluaccum, 0, 320 * sizeof(unsigned int));
+    hspan = hstretchrgb;
+    vspan = hshrinkrgb;
+    n = yb - yt + 1;
+    do
+    {
+        line(left, 0, right, pbmwidth-1);
+        for (p = 0; p < 320; p++)
+        {
+            redaccum[p] += redscan[p];
+            grnaccum[p] += grnscan[p];
+            bluaccum[p] += bluscan[p];
+        }
+    } while (++yt <= yb);
+    for (p = 0; p < 320; p++)
+    {
+        color(redaccum[p] / n, grnaccum[p] / n, bluaccum[p] / n);
+        pixel(p, x);
+    }
+    vspan = vshrinkrgb;
+}
+void vshrinkgrey(int x, int yt, int yb)
+{
+    unsigned int n, p, g;
+    unsigned int greyaccum[320];
+
+    memset(greyaccum, 0, 320 * sizeof(unsigned int));
+    hspan = hstretchgrey;
+    vspan = hshrinkgrey;
+    n = yb - yt + 1;
+    do
+    {
+        line(0, 0, pbmwidth, 319);
+        for (p = 0; p < 320; p++)
+        {
+            greyaccum[p] += greyscan[p];
+        }
+    } while (++yt <= yb);
+    for (p = 0; p < 320; p++)
+    {
+        g = greyaccum[p] / n;
+        color(g, g, g);
+        pixel(p, x);
+    }
+    vspan = vshrinkgrey;
+}
 /*
  * World's dumbest routine to read PGM/PNM files.
  */
 int main(int argc, char **argv)
 {
-    FILE *pbmfile;
-    int pbmwidth, pbmheight, pbmdepth;
-    int xorg, yorg, x, y, pbmrgb, mode;
-    unsigned char r, g, b, gamma[256], pbmformat[8];
-    float gammafunc;
+    int x, pbmrgb, scale, mode;
+    char pbmstring[80];
+    float gammafunc, pbmaspect;
 
     for (x = 0; x < 256; x++)
         gamma[x] = x;
-    mode = MODE_BEST;
+    left   =
+    top    = 0;
+    right  = 319;
+    bottom = 199;
+    scale  = 0; // Stretch or keep aspect
+    mode   = MODE_BEST;
     while (argc > 1 && argv[1][0] == '-')
     {
         if (argc > 2 && argv[1][1] == 'g')
@@ -39,6 +207,8 @@ int main(int argc, char **argv)
             mode |= MODE_MONO;
         else if (argv[1][1] == 'n')
             mode |= MODE_NODITHER;
+        else if (argv[1][1] == 'a')
+            scale = 1;
         argc--;
         argv++;
     }
@@ -52,45 +222,72 @@ int main(int argc, char **argv)
     }
     else
         pbmfile = stdin;
-    fgets(pbmformat, 4, pbmfile);
-    if (pbmformat[0] == 'P' && pbmformat[1] == '6')
+    fgets(pbmstring, 80, pbmfile);
+    if (pbmstring[0] == 'P' && pbmstring[1] == '6')
         pbmrgb = 1;
-    else if (pbmformat[0] == 'P' && pbmformat[1] == '5')
+    else if (pbmstring[0] == 'P' && pbmstring[1] == '5')
         pbmrgb = 0;
     else
     {
         fprintf(stderr, "Not a valid PBM file.\n");
         return -1;
     }
-    if (fscanf(pbmfile, "%d\n%d\n%d\n", &pbmwidth, &pbmheight, &pbmdepth) != 3)
+    do
     {
-        fprintf(stderr, "Bad PBM header.\n");
-        return -1;
+        fgets(pbmstring, 80, pbmfile);
+    } while (pbmstring[0] == '#');
+    if (sscanf(pbmstring, "%d %d %d", &pbmwidth, &pbmheight, &pbmdepth) != 3)
+    {
+        if (sscanf(pbmstring, "%d %d", &pbmwidth, &pbmheight) != 2)
+        {
+            fprintf(stderr, "Bad PBM header.\n");
+            return -1;
+        }
+        do
+        {
+            fgets(pbmstring, 80, pbmfile);
+        } while (pbmstring[0] == '#');
+        if (sscanf(pbmstring, "%d", &pbmdepth) != 1)
+        {
+            fprintf(stderr, "Bad PBM header.\n");
+            return -1;
+        }
     }
-    xorg = 160 - (pbmwidth / 2);
-    yorg = 100 - (pbmheight / 2);
+    if (scale)
+    {
+        pbmaspect = (float)pbmwidth/(float)pbmheight;
+        if (pbmaspect > SCREEN_ASPECT)
+        {
+            x       = 100.0 * (1.0 - SCREEN_ASPECT / pbmaspect);
+            top     = x;
+            bottom -= x;
+        }
+        else
+        {
+            x      = 160.0 * (1.0 - pbmaspect / SCREEN_ASPECT);
+            left   = x;
+            right -= x;
+        }
+    }
     if (!gfxmode(mode))
     {
         fprintf(stderr, "Unable to set graphics mode.\n");
         return -1;
     }
-    for (y = 0; y < pbmheight; y++)
-        for (x = 0; x < pbmwidth; x++)
-        {
-            r = gamma[getc(pbmfile)];
-            if (pbmrgb)
-            {
-                g = gamma[getc(pbmfile)];
-                b = gamma[getc(pbmfile)];
-            }
-            else
-                g = b = r;
-            if (x + xorg >= 0 && x + xorg < 320 && y + yorg >= 0 && y + yorg < 200)
-            {
-                color(r, g, b);
-                pixel(x + xorg, y + yorg);
-            }
-        }
+    //
+    // Use span line routines to stretch/shrink source image to 320x200
+    //
+    if (pbmrgb)
+    {
+        hspan = vstretchrgb;
+        vspan = vshrinkrgb;
+    }
+    else
+    {
+        hspan = vstretchgrey;
+        vspan = vshrinkgrey;
+    }
+    line(top, 0, bottom, pbmheight-1);
     getch();
     restoremode();
     return 0;

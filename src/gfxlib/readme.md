@@ -41,8 +41,11 @@ TRIFILL.EXE has additional flags to control filling and double buffering.
     
 ![FillTri](https://github.com/dschmenk/Bresen-Span/blob/master/images/filltri.png)
 
-SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) included. `SHOWPBM DESKPRO.PNM`:
+SHOWPBM.EXE also takes a parameter, the PBM file to display. There are a couple .PNM images (24BPP RGB PBM images) 
+included. `SHOWPBM DESKPRO.PNM`:
 
+    -a : keep aspect ratio of source image (default is to stretch)
+    
 ![DeskPro](https://github.com/dschmenk/Bresen-Span/blob/master/images/deskpro.png)
 
 SPHERE.EXE displays different tesselations of the three Platonic Solids with triangluar faces. The solids are the Octahedron, Tetrahedron, and Icosahedron. The other two, the Cube and Dodecahedron, have square and hexagonal faces. The options are:
