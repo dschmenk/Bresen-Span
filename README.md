@@ -148,7 +148,7 @@ By using function pointers for the horizontal and vertical spans, the line routi
 
 * Convex polygon filling - accumulate the edges drawn through line() and fill the results using the horizontal span routine lifted from line(). Look at [gfxmode.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/lib/GFXMODE.C) for an example using beginfill() and endfill().
 * Interpolating between two values. Look at [gfx8.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/lib/GFX8.C) for a simple example.
-* Interpolating between values in 2D - can be used for stretching/shrinking an image. Call ine() recursively, once for the vertical stretch/shrink, and again for the horizontal stretch/shrink. [Showpbm.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/demos/SHOWPBM.C) has a sample implementation.
+* Interpolating between values in 2D - can be used for stretching/shrinking an image. Call line() recursively, once for the vertical stretch/shrink, and again for the horizontal stretch/shrink. [Showpbm.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/demos/SHOWPBM.C) has a sample implementation.
 
 ## And now for something completely different: Anti Aliased Lines
 
