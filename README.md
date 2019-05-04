@@ -142,6 +142,14 @@ But now the initialization has been completed. Look at what happens next in the 
 ```
 Bam! That's it.
 
+## Not just for drawing lines
+
+By using function pointers for the horizontal and vertical spans, the line routine can be used for generalized linear interpolation. Here are a few uses demonstrated in the GFX library:
+
+* Convex polygon filling - accumulate the edges drawn through line() and fill the results using the horizontal span routine lifted from line(). Look at [gfxmode.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/lib/GFXMODE.C) for an example using beginfill() and endfill().
+* Interpolating between two values. Look at [gfx8.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/lib/GFX8.C) for a simple example.
+* Interpolating between values in 2D - can be used for stretching/shrinking an image. Call ine() recursively, once for the vertical stretch/shrink, and again for the horizontal stretch/shrink. [Showpbm.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/demos/SHOWPBM.C) has a sample implementation.
+
 ## And now for something completely different: Anti Aliased Lines
 
 A fast anti-aliased line routine using Wu's algorithm. This is more of a DDA implementation than a pure Bresenham. Calculating the slope in a 16.16 fixed point format provides the alpha component for free:
@@ -198,5 +206,5 @@ void aaline(int x1, int y1, int x2, int y2)
 ```
 ## GFXLib
 Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
-[GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib)
+[GFXLIB](
 
