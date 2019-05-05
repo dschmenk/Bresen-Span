@@ -87,7 +87,7 @@ void vstretchrgb(int xl, int xr, int y)
         for (p = 0; p < 320; p++)
         {
             color(redscan[p], grnscan[p], bluscan[p]);
-            pixel(p, scan);
+            pixel(p, xl);
         }
     } while (++xl <= xr);
     hspan = vstretchrgb;
@@ -104,7 +104,7 @@ void vstretchgrey(int xl, int xr, int y)
         for (p = 0; p < 320; p++)
         {
             color(greyscan[p], greyscan[p], greyscan[p]);
-            pixel(p, scan);
+            pixel(p, xl);
         }
     } while (++xl <= xr);
     hspan = vstretchgrey;
