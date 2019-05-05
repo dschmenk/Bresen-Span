@@ -4,7 +4,7 @@
 
 ## GFXLib
 Included is a complete graphics library (with demos and screenshots) showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
-[GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/)
+[GFXLIB](src/gfxlib/)
 
 ## Bresen-Span: A Span based Bresenham line routine
 There are many computer graphics papers written about improving upon the standard Bresenham's line drawing algorithm to speed it up using horizontal and vertical spans of pixels, instead of the one-pixel-at-a-time approach. Often, the resulting algorithm seems more complicated than it needs to be. So I went back and wrote my own making as few changes to the original to keep it simple.
@@ -150,9 +150,9 @@ Bam! That's it.
 
 By using function pointers for the horizontal and vertical spans, the line routine can be used for generalized linear interpolation. Here are a few uses demonstrated in the GFX library:
 
-* Convex polygon filling - accumulate the edges drawn through line() and fill the results using the horizontal span routine lifted from line(). Look at [gfxmode.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/lib/GFXMODE.C) for an example using beginfill() and endfill().
-* Interpolating between two values. Look at [gfx8.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/lib/GFX8.C) for a simple example.
-* Interpolating between values in 2D - can be used for stretching/shrinking an image. Call line() recursively, once for the vertical stretch/shrink, and again for the horizontal stretch/shrink. [Showpbm.c](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/demos/SHOWPBM.C) has a sample implementation.
+* Convex polygon filling - accumulate the edges drawn through line() and fill the results using the horizontal span routine lifted from line(). Look at [gfxmode.c](src/gfxlib/lib/GFXMODE.C) for an example using beginfill() and endfill().
+* Interpolating between two values. Look at [gfx8.c](src/gfxlib/lib/GFX8.C) for a simple example.
+* Interpolating between values in 2D - can be used for stretching/shrinking an image. Call line() recursively, once for the vertical stretch/shrink, and again for the horizontal stretch/shrink. [Showpbm.c](src/gfxlib/demos/SHOWPBM.C) has a sample implementation.
 
 ## And now for something completely different: Anti Aliased Lines
 
