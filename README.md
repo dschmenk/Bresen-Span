@@ -2,7 +2,7 @@
 ------------
 
 ## GFXLib
-Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
+Included is a complete graphics library (with demos and screenshots) showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
 [GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/)
 
 ## Bresen-Span: A Span based Bresenham line routine
