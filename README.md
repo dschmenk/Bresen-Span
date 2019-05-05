@@ -1,5 +1,6 @@
 # Fast Lines
 ------------
+![LineTest](images/aaline.png)
 
 ## GFXLib
 Included is a complete graphics library (with demos and screenshots) showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
