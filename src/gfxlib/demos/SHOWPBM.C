@@ -19,24 +19,6 @@ FILE *pbmfile;
 int pbmwidth, pbmheight, pbmdepth;
 int left, right, top, bottom;
 
-void renderscanrgb(int scan)
-{
-    int x;
-    for (x = 0; x < 320; x++)
-    {
-        color(redscan[x], grnscan[x], bluscan[x]);
-        pixel(x, scan);
-    }
-}
-void renderscangrey(int scan)
-{
-    int x;
-    for (x = 0; x < 320; x++)
-    {
-        color(greyscan[x], greyscan[x], greyscan[x]);
-        pixel(x, scan);
-    }
-}
 /*
  * Image stretch with help of span line routine
  */
@@ -94,23 +76,36 @@ void hshrinkgrey(int x, int yt, int yb)
 }
 void vstretchrgb(int xl, int xr, int y)
 {
+    int x;
+
     hspan = hstretchrgb;
     vspan = hshrinkrgb;
     line(left, 0, right, pbmwidth-1);
     do
     {
+        for (x = 0; x < 320; x++)
+        {
+            color(redscan[x], grnscan[x], bluscan[x]);
+            pixel(x, scan);
+        }
         renderscanrgb(xl);
     } while (++xl <= xr);
     hspan = vstretchrgb;
 }
 void vstretchgrey(int xl, int xr, int y)
 {
+    int x;
+
     hspan = hstretchgrey;
     vspan = hshrinkgrey;
     line(left, 0, right, pbmwidth-1);
     do
     {
-        renderscangrey(xl);
+        for (x = 0; x < 320; x++)
+        {
+            color(greyscan[x], greyscan[x], greyscan[x]);
+            pixel(x, scan);
+        }
     } while (++xl <= xr);
     hspan = vstretchgrey;
 }
