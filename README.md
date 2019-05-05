@@ -1,8 +1,11 @@
 # Fast Lines
 ------------
 
-## Bresen-Span: A Span based Bresenham line routine
+## GFXLib
+Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
+[GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/)
 
+## Bresen-Span: A Span based Bresenham line routine
 There are many computer graphics papers written about improving upon the standard Bresenham's line drawing algorithm to speed it up using horizontal and vertical spans of pixels, instead of the one-pixel-at-a-time approach. Often, the resulting algorithm seems more complicated than it needs to be. So I went back and wrote my own making as few changes to the original to keep it simple.
 
 ### Pixel-At-A-Time Bresenham
@@ -204,7 +207,3 @@ void aaline(int x1, int y1, int x2, int y2)
     ...
 }
 ```
-## GFXLib
-
-Included is a complete graphics library showcasing the line routines written for IBM PCs with a CGA, EGA, or VGA card:
-[GFXLIB](https://github.com/dschmenk/Bresen-Span/tree/master/src/gfxlib/)
