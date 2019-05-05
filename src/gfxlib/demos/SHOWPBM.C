@@ -88,7 +88,6 @@ void vstretchrgb(int xl, int xr, int y)
             color(redscan[x], grnscan[x], bluscan[x]);
             pixel(x, scan);
         }
-        renderscanrgb(xl);
     } while (++xl <= xr);
     hspan = vstretchrgb;
 }
