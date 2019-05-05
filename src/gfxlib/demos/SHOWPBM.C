@@ -6,6 +6,7 @@
 #define SCREEN_ASPECT   (320.0/200.0)
 
 #define greyscan    grnscan
+#define greyaccum   grnaccum
 
 unsigned char redscan[320];
 unsigned char grnscan[320];
@@ -138,7 +139,6 @@ void vshrinkrgb(int x, int yt, int yb)
 void vshrinkgrey(int x, int yt, int yb)
 {
     unsigned int n, p, g;
-    unsigned int greyaccum[320];
 
     memset(greyaccum, 0, 320 * sizeof(unsigned int));
     hspan = hstretchgrey;
