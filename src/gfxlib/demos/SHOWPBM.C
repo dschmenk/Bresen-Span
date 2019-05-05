@@ -146,7 +146,7 @@ void vshrinkgrey(int x, int yt, int yb)
     n = yb - yt + 1;
     do
     {
-        line(0, 0, pbmwidth, 319);
+        line(left, 0, right, pbmwidth-1);
         for (p = 0; p < 320; p++)
         {
             greyaccum[p] += greyscan[p];
@@ -286,4 +286,5 @@ int main(int argc, char **argv)
     restoremode();
     return 0;
 }
+
 
