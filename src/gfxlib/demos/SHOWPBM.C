@@ -76,34 +76,34 @@ void hshrinkgrey(int x, int yt, int yb)
 }
 void vstretchrgb(int xl, int xr, int y)
 {
-    int x;
+    int p;
 
     hspan = hstretchrgb;
     vspan = hshrinkrgb;
     line(left, 0, right, pbmwidth-1);
     do
     {
-        for (x = 0; x < 320; x++)
+        for (p = 0; p < 320; p++)
         {
-            color(redscan[x], grnscan[x], bluscan[x]);
-            pixel(x, scan);
+            color(redscan[p], grnscan[p], bluscan[p]);
+            pixel(p, scan);
         }
     } while (++xl <= xr);
     hspan = vstretchrgb;
 }
 void vstretchgrey(int xl, int xr, int y)
 {
-    int x;
+    int p;
 
     hspan = hstretchgrey;
     vspan = hshrinkgrey;
     line(left, 0, right, pbmwidth-1);
     do
     {
-        for (x = 0; x < 320; x++)
+        for (p = 0; p < 320; p++)
         {
-            color(greyscan[x], greyscan[x], greyscan[x]);
-            pixel(x, scan);
+            color(greyscan[p], greyscan[p], greyscan[p]);
+            pixel(p, scan);
         }
     } while (++xl <= xr);
     hspan = vstretchgrey;
