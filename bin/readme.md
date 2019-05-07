@@ -1,1 +1,1 @@
-Moved to src/gfxlib/bin
+Moved to [src/gfxlib/bin](src/gfxlib/bin)
