@@ -13,12 +13,15 @@ CONST	ENDS
 _BSS	SEGMENT  WORD PUBLIC 'BSS'
 _BSS	ENDS
 DGROUP	GROUP	CONST, _BSS, _DATA
-	ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
+
+        ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
+
 EXTRN	_hspan:NEAR
 EXTRN	_vspan:NEAR
+
 _TEXT   SEGMENT
-	ASSUME	CS: _TEXT
-	PUBLIC	_line
+
+        PUBLIC	_line
 _line	PROC NEAR
 	push	bp
 	mov	bp,sp
@@ -89,14 +92,16 @@ hsetup:
         mov	si,WORD PTR [bp+4]	;x1
 	mov	WORD PTR [bp-2],si	;ps
         shr     ax,1                    ;dx2/2
-	mov	cx,ax
+;	mov	cx,ax
 	xor     dx,dx
 	div	bx                      ;dy2
-	add	si,ax	                ;x1+=halflen
-	inc	ax
-	mul	bx                      ;dy2
-	sub	ax,cx                   ;dx2/2
-	mov	cx,ax	                ;err
+	mov	cx,bx	                ;err=dy2-rem
+        sub     cx,dx
+        add	si,ax	                ;x1+=halflen
+;	inc	ax
+;	mul	bx                      ;dy2
+;       sub	ax,cx                   ;dx2/2
+;	mov	cx,ax	                ;err
 	mov	dx,si	                ;x1
 	sub	dx,WORD PTR [bp-2]	;ps
         inc     dx
@@ -178,10 +183,12 @@ vsetup:
 	xor     dx,dx
 	div	cx
 	add	si,ax	                ;y1+=halflen
-	inc	ax
-	mul	cx
-	sub	ax,bx
-	mov	bx,ax	                ;err
+	mov	bx,cx	                ;err=dy2-rem
+        sub     bx,dx
+;	inc	ax
+;	mul	cx
+;	sub	ax,bx
+;	mov	bx,ax	                ;err
 	mov	dx,si	                ;y1
 	sub	dx,WORD PTR [bp-2]	;ps
         inc     dx
