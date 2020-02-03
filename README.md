@@ -67,6 +67,7 @@ void line(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
     int shorterr, shortlen, longerr, longlen, halflen;
+    t_div result;
 
     sx = sy = 1;
     if ((dx2 = (x2 - x1) * 2) < 0)
@@ -97,8 +98,9 @@ We have defined a few more variables that will be needed and there is an explici
 ```
         ps  = x1;
 #ifdef FAST_MULDIV
-        halflen = (dx2 / 2) / dy2; // Find first half-span length and error
-        err     = (halflen + 1) * dy2 - dx2 / 2;
+        result = div(dx2 / 2, dy2); // Find first half-span length and error
+        halflen = result.quot 
+        err     = dy2 - result.rem;
         x1     += halflen;
 #else
         err = dy2 - dx2 / 2;
