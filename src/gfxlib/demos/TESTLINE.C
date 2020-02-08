@@ -1,3 +1,4 @@
+#define __MSC
 #include <stdio.h>
 #include <bios.h>
 #include <dos.h>
@@ -71,7 +72,7 @@ int main(int argc, char **argv)
     }
 #endif
     linetime = gettime() - linetime;
-    flip(NO_VSYNC);
+    flip();
     color(0, 0, 0);
     clear();
     aatime = gettime();
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
     }
     aatime = gettime() - aatime;
     getch();
-    flip(NO_VSYNC);
+    flip();
     getch();
     restoremode();
     printf("Line time = %lu\nAnti-Alias line time = %lu\n", linetime, aatime);

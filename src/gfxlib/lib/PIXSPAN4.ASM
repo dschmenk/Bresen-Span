@@ -1,3 +1,4 @@
+
 ;       Static Name Aliases
 ;
         TITLE   PIXSPAN4.ASM
@@ -12,7 +13,8 @@ CONST	ENDS
 _BSS	SEGMENT  WORD PUBLIC 'BSS'
 _BSS	ENDS
 DGROUP	GROUP	CONST, _BSS, _DATA
-	ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
+
+        ASSUME  CS: _TEXT, DS: DGROUP, SS: DGROUP
 
 EXTRN	_renderbuff:NEAR
 EXTRN   _pixmask:NEAR
@@ -21,8 +23,7 @@ EXTRN   _idx4:NEAR
 EXTRN   _packbrush4:NEAR
 EXTRN   _amul4:NEAR
 
-_TEXT      SEGMENT
-	ASSUME	CS: _TEXT
+_TEXT   SEGMENT
 
         PUBLIC	_clear4
 ;void clear4(void)

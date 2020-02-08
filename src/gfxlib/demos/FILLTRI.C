@@ -5,8 +5,8 @@
 
 unsigned char bitmap[] =
 {
+    0x00, 0x00, 0x00,
     0x7F, 0xFF, 0xFE,
-    0xFF, 0xFF, 0xFF,
     0x80, 0x00, 0x01,
     0x80, 0x00, 0x01,
     0x80, 0x3C, 0x01,
@@ -18,9 +18,9 @@ unsigned char bitmap[] =
     0x80, 0x00, 0x01,
     0x80, 0x00, 0x01,
     0xFF, 0xFF, 0xFF,
-    0x7F, 0xFF, 0xFE
+    0x00, 0x18, 0x00
 };
-
+#ifdef __MSC
 unsigned long gettime(void)
 {
     struct dostime_t time;
@@ -28,7 +28,7 @@ unsigned long gettime(void)
     _dos_gettime(&time);
     return time.hour * 360000UL + time.minute * 6000UL + time.second * 100UL + time.hsecond;
 }
-
+#endif
 int main(int argc, char **argv)
 {
     int mode, c, f, b, aa;
@@ -67,7 +67,9 @@ int main(int argc, char **argv)
     gfxmode(mode);
     if (b)
         render(BACK_PAGE);
+#ifdef __MSC
     srand(gettime());
+#endif
     for (c = 0; c < 3; c++)
     {
         xv[c]   = rand() % 319 + 1;
@@ -109,7 +111,7 @@ int main(int argc, char **argv)
         }
         color(h, 0, h); h += 16;
         text(148, 72, "GFXLib!");
-        //bitblt(148, 72, 24, 14, 0, 0, bitmap, 3);
+        bitblt(148, 100, 24, 14, 0, 0, bitmap, 3);
         for (c = 0; c < 3; c++)
         {
             xv[c] += ix[c];
@@ -147,9 +149,10 @@ int main(int argc, char **argv)
             }
         }
         if (b)
-            flip(VSYNC);
+            flip();
     }
     getch();
     restoremode();
     return 0;
 }
+
