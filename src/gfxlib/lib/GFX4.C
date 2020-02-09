@@ -113,6 +113,13 @@ void hspan4(int xl, int xr, int y);
 void vspan4(int x, int yt, int yb);
 void pixel4alpha(int x, int y, int alpha);
 
+static void fill4i(int xl, int xr, int y)
+{
+    do
+    {
+        mapgrey[xl] = y >> 4;
+    } while (++xl <= xr);
+}
 int gfxmode4(int modeflags)
 {
     union REGS regs;
@@ -135,8 +142,13 @@ int gfxmode4(int modeflags)
 	    /*
 	     * Fill greyscale mapping arrays.
 	     */
+#if 1
+        hspan = fill4i;
+        line(0, 0, 256+16-1, 255); // Use span line routine to lerp
+#else
 	    for (c = 0; c < 256+16; c++)
-		    mapgrey[c] = greyramp[((unsigned char)(c * 16 / (256+16)))];
+		    mapgrey[c] = greyramp[(unsigned char)((c*16)/(256+16))];
+#endif
         color = mono4rgb;
     }
     else
@@ -218,7 +230,7 @@ static void mono4rgb(int red, int grn, int blu)
     rgb4[GRN] = grn;
     rgb4[BLU] = blu;
     i = (red >> 2) + (grn >> 1) + (blu >> 2);
-    idx4      = mapgrey[i];
+    idx4      = greyramp[i >> 4];
     /*
      * Dither grey map to 16 levels.
      */
@@ -305,7 +317,7 @@ static void color4rgb(int red, int grn, int blu)
             brush4[RED] = 0;
             brush4[GRN] = 0;
             brush4[BLU] = 0;
-            idx4       = 0x08;
+            idx4        = v > 31 ? 0x08 : 0x00;
         }
         else
         {
