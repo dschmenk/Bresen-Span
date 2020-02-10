@@ -117,7 +117,7 @@ static void fill4i(int xl, int xr, int y)
 {
     do
     {
-        mapgrey[xl] = y >> 4;
+        mapgrey[xl] = greyramp[y >> 4];
     } while (++xl <= xr);
 }
 int gfxmode4(int modeflags)
@@ -147,7 +147,7 @@ int gfxmode4(int modeflags)
         line(0, 0, 256+16-1, 255); // Use span line routine to lerp
 #else
 	    for (c = 0; c < 256+16; c++)
-		    mapgrey[c] = greyramp[(unsigned char)((c*16)/(256+16))];
+		    mapgrey[c] = greyramp[((unsigned char)(c * 16 / (256+16)))];
 #endif
         color = mono4rgb;
     }
