@@ -4,7 +4,7 @@ void line(int x1, int y1, int x2, int y2)
 {
     int dx2, dy2, err, sx, sy, ps;
     int shorterr, shortlen, longerr, longlen, halflen;
-    t_div result;
+    div_t result;
 
     sx = sy = 1;
     if ((dx2 = (x2 - x1) * 2) < 0)
