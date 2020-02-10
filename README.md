@@ -111,7 +111,7 @@ We have defined a few more variables that will be needed and there is an explici
         }
 #endif
 ```
-A little explanation is in order. The Bresenham algorithm is quite clever in that it is symetrical. Remember when I said there were only two lengths of spans? I lied. The first and last spans are half length. The initial error term for the pixel-at-a-time Bresenham algorithm looks like this: `err = dy2 - dx2 / 2;` which initializes the error term to 0.5, thus starting half-way through the first span. In order to replicate this, the span-at-a-time algorithm calculates this half-span length with either division & multiplication if you have fast hardware for those operations, or a long division version if you don't. Once the half-span length has been calculated, time to figure out the long and short span values based on the half-span:
+A little explanation is in order. The Bresenham algorithm is quite clever in that it is symetrical. Remember when I said there were only two lengths of spans? I lied. The first and last spans are half length. The initial error term for the pixel-at-a-time Bresenham algorithm looks like this: `err = dy2 - dx2 / 2;` which initializes the error term to 0.5, thus starting half-way through the first span. In order to replicate this, the span-at-a-time algorithm calculates this half-span length with either division if you have fast hardware for those operations, or a long subtractive division version if you don't. Once the half-span length has been calculated, time to figure out the long and short span values based on the half-span:
 ```
         longlen = (x1 - ps + 1) * 2; // Long-span length = half-span length * 2
         longerr = err * 2;
