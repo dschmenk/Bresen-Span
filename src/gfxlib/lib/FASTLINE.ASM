@@ -90,7 +90,7 @@ leftright:
 hsetup:
 	mov	WORD PTR [bp-14],cx	;sy
         mov	si,WORD PTR [bp+4]	;x1
-	mov	WORD PTR [bp-2],si	;ps
+	mov	di,si	                ;ps
         shr     ax,1                    ;dx2/2
 	xor     dx,dx
 	div	bx                      ;dy2
@@ -98,7 +98,8 @@ hsetup:
         sub     cx,dx
         add	si,ax	                ;x1+=halflen
 	mov	dx,si	                ;x1
-	sub	dx,WORD PTR [bp-2]	;ps
+        mov     ax,di                   ;ps
+	sub	dx,ax
         inc     dx
 	shl	dx,1                    ;longlen=(x1-ps+1)*2
 	mov	di,cx	                ;err
@@ -120,13 +121,12 @@ nohround:
 hloop:
 	push	WORD PTR [bp+6]	        ;y1
 	push	si                      ;x1
-	push	WORD PTR [bp-2]	        ;ps
+	push	ax      	        ;ps
 	call	WORD PTR _hspan
 	add	sp,6
 	mov	ax,WORD PTR [bp-14]	;sy
 	add	WORD PTR [bp+6],ax	;y1
-	lea	ax,WORD PTR [si+1]
-	mov	WORD PTR [bp-2],ax	;ps
+	lea	ax,WORD PTR [si+1]      ;ps
 	or	di,di                   ;err
 	jl	hlong
 hshort:
@@ -143,7 +143,7 @@ hlong:
 hlast:
 	push	WORD PTR [bp+10]	;y2
 	push	WORD PTR [bp+8]	        ;x2
-	push	WORD PTR [bp-2]	        ;ps
+	push	ax      	        ;ps
 	call	WORD PTR _hspan
 	jmp	exit
 ;
@@ -171,7 +171,7 @@ topbottom:
 vsetup:
 	mov	WORD PTR [bp-12],dx	;sx
         mov	si,WORD PTR [bp+6]	;y1
-	mov	WORD PTR [bp-2],si	;ps
+	mov	di,si	                ;ps
         mov	cx,ax	                ;dx2
         shr     bx,1                    ;dy2/2
 	mov	ax,bx
@@ -181,7 +181,8 @@ vsetup:
 	mov	bx,cx	                ;err=dy2-rem
         sub     bx,dx
 	mov	dx,si	                ;y1
-	sub	dx,WORD PTR [bp-2]	;ps
+	mov	ax,di           	;ps
+	sub	dx,ax
         inc     dx
 	shl	dx,1                    ;longlen=(y1-ps+1)*2
 	mov	di,bx	                ;err
@@ -202,14 +203,13 @@ novround:
 	jge	vlast
 vloop:
 	push	si                      ;y1
-	push	WORD PTR [bp-2]	        ;ps
+	push	ax	                ;ps
 	push	WORD PTR [bp+4]	        ;x1
 	call	WORD PTR _vspan
 	add	sp,6
 	mov	ax,WORD PTR [bp-12]	;sx
 	add	WORD PTR [bp+4],ax	;x1
-	lea	ax,WORD PTR [si+1]
-	mov	WORD PTR [bp-2],ax	;ps
+	lea	ax,WORD PTR [si+1]      ;ps
 	or	di,di                   ;err
 	jl	vlong
 vshort:
@@ -225,7 +225,7 @@ vlong:
 	jl	vloop
 vlast:
 	push	WORD PTR [bp+10]	;y2
-	push	WORD PTR [bp-2]	        ;ps
+	push	ax      	        ;ps
 	push	WORD PTR [bp+8]	        ;x2
 vexit:
 	call	WORD PTR _vspan
