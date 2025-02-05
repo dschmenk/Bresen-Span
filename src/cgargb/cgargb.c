@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <strings.h>
 #include <memory.h>
 #include <ctype.h>
+#ifdef DOS
+#include <dos.h>
+#endif
 
-#define X_RES 640
-#define Y_RES 200
-
-#define RED 0
-#define GRN 1
-#define BLU 2
+/* CGA high resolution */
+#define X_RES              640
+#define Y_RES              200
 /* According to what I could find out about the NTSC color wheel:
  *   Red maxes at 103.5 degrees
  *   Green maxes at 240.7 degrees
@@ -32,12 +31,18 @@
 #define GREEN_PHASE_SIMPLE 225
 #define BLUE_PHASE_SIMPLE  360
 /* Flags */
-#define DUMP_STATE          2 /* Dump internal state */
-#define DEG_TO_RAD          0.0174533
-#define min(a,b)    ((a)<(b)?(a):(b))
-#define max(a,b)    ((a)>(b)?(a):(b))
-#define TRUE                1
-#define FALSE               0
+#define DUMP_STATE         2 /* Dump internal state */
+/* Handy macros */
+#ifndef DOS
+#define min(a,b)           ((a)<(b)?(a):(b))
+#define max(a,b)           ((a)>(b)?(a):(b))
+#endif
+#define RED                0
+#define GRN                1
+#define BLU                2
+#define DEG_TO_RAD         0.0174533
+#define TRUE               1
+#define FALSE              0
 unsigned char ntscChroma[4][3];
 int prevRed, prevBlu, prevGrn;
 unsigned char gammaRed[256]; /* RED gamma correction */
@@ -48,6 +53,7 @@ int gammacorrect = 1; /* Gamma correction */
 int brightness   = 0;
 int saturation   = 255; /* 1.0 */
 int tint         = 22;  /* = 45/2 deg */
+int orgmode;
 int errDiv       = 4;
 unsigned char rgbScanline[X_RES * 3]; /* RGB scanline */
 int rgbErr[(X_RES + 1) * 3]; /* Running color error array */
@@ -131,6 +137,9 @@ void rgbInit(void)
 {
   int i;
   long int g32;
+#ifdef DOS
+  union REGS regs;
+#endif
 
   switch (gammacorrect)
   {
@@ -198,13 +207,28 @@ void rgbInit(void)
       printf("    [%3d, %3d %3d]\n", ntscChroma[i][RED],
                                      ntscChroma[i][GRN],
                                      ntscChroma[i][BLU]);
+    getchar();
   }
-  //dhgrMode(DHGR_COLOR_MODE)
+#ifdef DOS
+  /* Get current mode */
+  regs.x.ax = 0x0F00;
+  int86(0x10, &regs, &regs);
+  orgmode = regs.h.al;
+  /* Set mode 0x06 640x200 */
+  regs.x.ax = 0x0006;
+  int86(0x10, &regs, &regs);
+  /* Enable colorburst */
+#endif
 }
 
 void rgbExit(void)
 {
-  //dhgrMode(DHGR_TEXT_MODE)
+#ifdef DOS
+  union REGS regs;
+
+  regs.x.ax = orgmode;
+  int86(0x10, &regs, &regs);
+#endif
 }
 
 char *pnmReadElement(FILE *fp, char *bufptr)
@@ -255,8 +279,13 @@ int pnmVerifyHeader(FILE *fp)
 int rgbImportExport(char *pnmfile)
 {
   FILE *fp;
-  unsigned char chromaBits, *scanptr, *rgbptr;
-  int bit, scanbyte, scanline, r, g, b, *errptr;
+#ifdef DOS
+  unsigned char far *scanptr;
+#else
+  unsigned char *scanptr;
+#endif
+  unsigned char chromaBits, *rgbptr;
+  int bit, scanbyte, scan, r, g, b, *errptr;
 
   if (flags & DUMP_STATE)
     printf("PNM file = %s\n", pnmfile);
@@ -266,11 +295,13 @@ int rgbImportExport(char *pnmfile)
     if (pnmVerifyHeader(fp))
     {
       rgbInit();
+#ifndef DOS
       scanptr = malloc(X_RES / 8);
+#endif
       /* Init error propogation array */
       memset(rgbScanline, 0, X_RES * 3);
       memset(rgbErr, 0, X_RES * 3 * sizeof(int));
-      for (scanline = 0; scanline < Y_RES; scanline++)
+      for (scan = 0; scan < Y_RES; scan++)
       {
         fread(rgbScanline, X_RES, 3, fp);
         /* Reset prev RGB to neutral color */
@@ -280,6 +311,9 @@ int rgbImportExport(char *pnmfile)
         /* Reset pointers */
         rgbptr  = rgbScanline;
         errptr  = rgbErr;
+#ifdef DOS
+        scanptr = (unsigned char far *)(0xB8000000L + (scan >> 1) * 80 + (scan & 1) * 8192);
+#endif
         for (scanbyte = 0; scanbyte < X_RES/8; scanbyte++)
         {
           chromaBits = 0;
