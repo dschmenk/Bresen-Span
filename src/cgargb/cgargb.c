@@ -49,10 +49,10 @@ unsigned char gammaRed[256]; /* RED gamma correction */
 unsigned char gammaGrn[256]; /* GREEN gamma correction */
 unsigned char gammaBlu[256]; /* BLUE gamma correction */
 int phase[3] = {RED_PHASE_NTSC, GREEN_PHASE_NTSC, BLUE_PHASE_NTSC};
-int gammacorrect = 1; /* Gamma correction */
+int gammacorrect = 0; /* Gamma correction */
 int brightness   = 0;
 int saturation   = 255; /* 1.0 */
-int tint         = 22-180;  /* = 45/2 deg */
+int tint         = 180; /* CGA is 180 degrees out of phase with color burst */
 int orgmode;
 int errDiv       = 4;
 unsigned char rgbScanline[X_RES * 3]; /* RGB scanline */
