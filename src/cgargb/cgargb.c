@@ -52,7 +52,7 @@ int phase[3] = {RED_PHASE_NTSC, GREEN_PHASE_NTSC, BLUE_PHASE_NTSC};
 int gammacorrect = 1; /* Gamma correction */
 int brightness   = 0;
 int saturation   = 255; /* 1.0 */
-int tint         = 22;  /* = 45/2 deg */
+int tint         = 22-180;  /* = 45/2 deg */
 int orgmode;
 int errDiv       = 4;
 unsigned char rgbScanline[X_RES * 3]; /* RGB scanline */
@@ -76,9 +76,9 @@ void calcChroma(int angle)
   for (i = 0; i < 4; i++)
   {
     /* Calculate RGB for this NTSC subcycle pixel */
-    r = saturation + (int)(cos((angle - phase[RED]) * DEG_TO_RAD) * 128);
-    g = saturation + (int)(cos((angle - phase[GRN]) * DEG_TO_RAD) * 128);
-    b = saturation + (int)(cos((angle - phase[BLU]) * DEG_TO_RAD) * 128);
+    r = saturation + (int)(cos((angle - phase[RED]) * DEG_TO_RAD) * 255);
+    g = saturation + (int)(cos((angle - phase[GRN]) * DEG_TO_RAD) * 255);
+    b = saturation + (int)(cos((angle - phase[BLU]) * DEG_TO_RAD) * 255);
     /* Make chroma add up to white */
     ntscChroma[i][RED] = min(255, max(0, (r + 2) / 4));
     ntscChroma[i][GRN] = min(255, max(0, (g + 2) / 4));
@@ -97,9 +97,9 @@ int rgbMatchChroma(int r, int g, int b, int *errptr, int cx)
   /* Apply error propogation */
   if (errDiv)
   {
-    r = r + errptr[RED] / errDiv;
-    g = g + errptr[GRN] / errDiv;
-    b = b + errptr[BLU] / errDiv;
+    r += errptr[RED] / errDiv;
+    g += errptr[GRN] / errDiv;
+    b += errptr[BLU] / errDiv;
   }
   /* Previous RGB chroma subcycles */
   prevRed = (prevRed * 3) / 4;
@@ -127,9 +127,9 @@ int rgbMatchChroma(int r, int g, int b, int *errptr, int cx)
   errptr[GRN] = errGrn;
   errptr[BLU] = errBlu;
   /* And forward (add to previous row error for next match) */
-  errptr[RED + 3] = errRed + errptr[RED + 3];
-  errptr[GRN + 3] = errGrn + errptr[GRN + 3];
-  errptr[BLU + 3] = errBlu + errptr[BLU + 3];
+  errptr[RED + 3] += errRed;
+  errptr[GRN + 3] += errGrn;
+  errptr[BLU + 3] += errBlu;
   return pix;
 }
 
@@ -146,7 +146,7 @@ int rgbInit(void)
     case -1:
       for (i = 0; i < 256; i++)
       {
-        g32 = (255 - i + 255 - (i * i + 127)/255) / 2;
+        g32 = (255 - i + 255 - ((long int)i * (long int)i + 127)/255) / 2;
         gammaRed[255 - i] = g32;
         gammaGrn[255 - i] = g32;
         gammaBlu[255 - i] = g32;
@@ -155,7 +155,7 @@ int rgbInit(void)
     case -2:
       for (i = 0; i < 256; i++)
       {
-        g32 = 255 - (i * i + 127)/255;
+        g32 = 255 - ((long int)i * (long int)i + 127)/255;
         gammaRed[255 - i] = g32;
         gammaGrn[255 - i] = g32;
         gammaBlu[255 - i] = g32;
@@ -164,7 +164,7 @@ int rgbInit(void)
     case 2:
       for (i = 0; i < 256; i++)
       {
-        g32 = (i * i + 127) / 255;
+        g32 = ((long int)i * (long int)i + 127) / 255;
         gammaRed[i] = g32;
         gammaGrn[i] = g32;
         gammaBlu[i] = g32;
@@ -173,7 +173,7 @@ int rgbInit(void)
     case 1:
       for (i = 0; i < 256; i++)
       {
-        g32 = (i + (i * i + 127) / 255) / 2;
+        g32 = (i + ((long int)i * (long int)i + 127) / 255) / 2;
         gammaRed[i] = g32;
         gammaGrn[i] = g32;
         gammaBlu[i] = g32;
