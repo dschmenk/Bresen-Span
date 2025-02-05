@@ -63,9 +63,9 @@ long int dist(int dr, int dg, int db)
 {
   long int rr, gg, bb;
 
-  rr = dr * dr;
-  gg = dg * dg;
-  bb = db * db;
+  rr = (long int)dr * (long int)dr;
+  gg = (long int)dg * (long int)dg;
+  bb = (long int)db * (long int)db;
   return rr + gg + bb;
 }
 
@@ -76,13 +76,13 @@ void calcChroma(int angle)
   for (i = 0; i < 4; i++)
   {
     /* Calculate RGB for this NTSC subcycle pixel */
-    r = saturation + (int)(cos((angle - phase[RED]) * DEG_TO_RAD) * 255);
-    g = saturation + (int)(cos((angle - phase[GRN]) * DEG_TO_RAD) * 255);
-    b = saturation + (int)(cos((angle - phase[BLU]) * DEG_TO_RAD) * 255);
+    r = saturation + (int)(cos((angle - phase[RED]) * DEG_TO_RAD) * 128);
+    g = saturation + (int)(cos((angle - phase[GRN]) * DEG_TO_RAD) * 128);
+    b = saturation + (int)(cos((angle - phase[BLU]) * DEG_TO_RAD) * 128);
     /* Make chroma add up to white */
-    ntscChroma[i][RED] = (r + 2) / 4;
-    ntscChroma[i][GRN] = (g + 2) / 4;
-    ntscChroma[i][BLU] = (b + 2) / 4;
+    ntscChroma[i][RED] = min(255, max(0, (r + 2) / 4));
+    ntscChroma[i][GRN] = min(255, max(0, (g + 2) / 4));
+    ntscChroma[i][BLU] = min(255, max(0, (b + 2) / 4));
     /* Next NTSC chroma subcycle pixel */
     angle = angle - 90;
   }
@@ -119,21 +119,21 @@ int rgbMatchChroma(int r, int g, int b, int *errptr, int cx)
     prevBlu = currBlu;
     pix = 1;
   }
-  /* Propogate error down */
+  /* Propogate error down (overwrite error at this coordinate for next row) */
   errRed = r - prevRed;
   errGrn = g - prevGrn;
   errBlu = b - prevBlu;
   errptr[RED] = errRed;
   errptr[GRN] = errGrn;
   errptr[BLU] = errBlu;
-  /* And forward */
+  /* And forward (add to previous row error for next match) */
   errptr[RED + 3] = errRed + errptr[RED + 3];
   errptr[GRN + 3] = errGrn + errptr[GRN + 3];
   errptr[BLU + 3] = errBlu + errptr[BLU + 3];
   return pix;
 }
 
-void rgbInit(void)
+int rgbInit(void)
 {
   int i;
   long int g32;
@@ -197,8 +197,8 @@ void rgbInit(void)
   calcChroma(tint);
   if (flags & DUMP_STATE)
   {
-    printf("Gamma = %d\n", gammacorrect);
     printf("Err Div = %d\n", errDiv);
+    printf("Gamma = %d\n", gammacorrect);
     printf("Brightness = %d\n", brightness);
     printf("Tint = %d\n", tint);
     printf("Saturation = %d\n", saturation);
@@ -217,8 +217,15 @@ void rgbInit(void)
   /* Set mode 0x06 640x200 */
   regs.x.ax = 0x0006;
   int86(0x10, &regs, &regs);
+  /* Verify mode set */
+  regs.x.ax = 0x0F00;
+  int86(0x10, &regs, &regs);
+  if (regs.h.al != 0x06)
+    return FALSE;
   /* Enable colorburst */
+  outp(0x3D8, 0x1B);
 #endif
+  return TRUE;
 }
 
 void rgbExit(void)
@@ -226,6 +233,7 @@ void rgbExit(void)
 #ifdef DOS
   union REGS regs;
 
+  getchar();
   regs.x.ax = orgmode;
   int86(0x10, &regs, &regs);
 #endif
@@ -292,9 +300,8 @@ int rgbImportExport(char *pnmfile)
   fp = fopen(pnmfile, "rb");
   if (fp)
   {
-    if (pnmVerifyHeader(fp))
+    if (pnmVerifyHeader(fp) && rgbInit())
     {
-      rgbInit();
 #ifndef DOS
       scanptr = malloc(X_RES / 8);
 #endif
@@ -330,8 +337,8 @@ int rgbImportExport(char *pnmfile)
           }
           scanptr[scanbyte] = chromaBits;
         }
-        rgbExit();
       }
+      rgbExit();
     }
     fclose(fp);
     return 0;
